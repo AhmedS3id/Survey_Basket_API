@@ -1,4 +1,9 @@
-﻿
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Survey_Basket_API.Models;
+using Survey_Basket_API.Services;
+using System.Diagnostics.Contracts;
+
 namespace Survey_Basket_API.Controllers
 {
     [Route("api/[controller]")]
@@ -14,7 +19,7 @@ namespace Survey_Basket_API.Controllers
 
         [HttpGet]
 
-        public IActionResult GetAll()
+        public IActionResult GetAll() 
         {
             var polls = _pollServices.GetAll();
             var Response = polls.Adapt<IEnumerable<PollResponse>>();
@@ -32,7 +37,8 @@ namespace Survey_Basket_API.Controllers
 
             var response = poll.Adapt<PollResponse>();
             return Ok(response);
-
+            
+            return poll is null ? NotFound() : Ok(poll);
         }
 
         [HttpPost("")]
@@ -63,6 +69,8 @@ namespace Survey_Basket_API.Controllers
             }
             return NoContent();
         }
+
+        
 
     }
 }
