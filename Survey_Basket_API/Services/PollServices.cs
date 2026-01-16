@@ -1,37 +1,45 @@
 ﻿
 
+using Survey_Basket_API.Entities;
+using Survey_Basket_API.Persistence;
+using System.Threading.Tasks;
+
 namespace Survey_Basket_API.Services
 {
-    public class PollServices : IPollServices
+    public class PollServices(AppDbContext context) : IPollServices
     {
-        private readonly static List<Poll> _Polls = new List<Poll>
+        private readonly AppDbContext _context = context;
+       
+        public async Task<IEnumerable<Poll>> GetAllAsync(CancellationToken cancellationToken ) =>
+            await _context.Polls.AsNoTracking().ToListAsync( cancellationToken);
+
+
+
+        public async Task<Poll?> GetAsync(int id, CancellationToken cancellationToken )
         {
-        new Poll{Id=1,Title="My Title",Description="THIS IS MY FIRST API" }
-        };
-        public IEnumerable<Poll> GetAll()
-        {
-            return _Polls;
-        }
-        public Poll? Get(int id)
-        {
-           return _Polls.SingleOrDefault(x => x.Id == id);
+           return  await _context.Polls.FindAsync(id,cancellationToken);
         }
 
-        public Poll Add(Poll poll)
+        public  async Task< Poll> AddAsync(Poll poll, CancellationToken cancellationToken )
         {
-            poll.Id = _Polls.Count + 1;
-            _Polls.Add(poll);
+            await _context.AddAsync(poll,cancellationToken);
+            await _context.SaveChangesAsync(cancellationToken);
             return poll;
-        
+
         }
 
-        public bool updated(int id , Poll poll)
+        public async Task< bool> updateAsync(int id, Poll poll,CancellationToken cancellationToken)
         {
-           var CurrentPoll = Get(id);
+            var CurrentPoll =await GetAsync(id,cancellationToken);
             if (CurrentPoll != null)
             {
-                CurrentPoll.Title = poll.Title ;
-                 CurrentPoll.Description = poll.Description;
+                CurrentPoll.Title = poll.Title;
+                CurrentPoll.Summary = poll.Summary;
+                CurrentPoll.StartsAt = poll.StartsAt;
+                CurrentPoll.EndsAt = poll.EndsAt;
+               
+
+                await _context.SaveChangesAsync(cancellationToken);
                 return true;
             }
             else
@@ -40,16 +48,33 @@ namespace Survey_Basket_API.Services
             }
         }
 
-        public bool delete(int id)
+        public async Task < bool> deleteAsync(int id, CancellationToken cancellationToken = default)
         {
-           var poll = Get(id);
+            var poll =await GetAsync(id,cancellationToken);
             if (poll != null)
             {
-              _Polls.Remove(poll);
+                _context.Remove(poll);
+                await _context.SaveChangesAsync(cancellationToken);
                 return true;
             }
-          
+
             return false;
+        }
+
+        public async Task<bool> TogglePublishStatusAsync(int id, CancellationToken cancellationToken)
+        {
+            var CurrentPoll = await GetAsync(id, cancellationToken);
+            if (CurrentPoll != null)
+            {
+                CurrentPoll.IsPublished = !CurrentPoll.IsPublished;
+
+                await _context.SaveChangesAsync(cancellationToken);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 }

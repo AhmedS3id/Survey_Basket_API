@@ -1,12 +1,17 @@
-
-
 using Survey_Basket_API;
+using Survey_Basket_API.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddDependaces();
+builder.Services.Add_Dependencies(builder.Configuration);
+var ConnectionString = builder.Configuration.GetConnectionString("DefaultConnection") ??
+    throw new InvalidOperationException("Connection String 'DefaultConnection' Is Not Found .");
+
+builder.Services.AddDbContext<AppDbContext>
+    (options=>options.UseSqlServer(ConnectionString));
+
 
 var app = builder.Build();
 

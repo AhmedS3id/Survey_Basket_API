@@ -1,16 +1,17 @@
-﻿using Survey_Basket_API.Models;
+﻿using Survey_Basket_API.Entities;
 
 namespace Survey_Basket_API.Services
 {
     public  interface IPollServices
     {
-        IEnumerable<Poll> GetAll();
+        Task <IEnumerable<Poll>> GetAllAsync(CancellationToken cancellationToken =default);
 
-        public Poll Get(int id);
+        Task < Poll?> GetAsync(int id, CancellationToken cancellationToken = default);
 
-        public Poll Add(Poll poll);
-        public bool updated(int id ,Poll poll);
+        Task < Poll> AddAsync(Poll poll, CancellationToken cancellationToken = default);
+         Task< bool >updateAsync(int id, Poll poll,CancellationToken cancellationToken=default);
 
-        public bool delete(int id);
+        Task< bool> deleteAsync(int id,CancellationToken cancellationToken=default);
+        Task< bool> TogglePublishStatusAsync(int id,CancellationToken cancellationToken=default);
     }
 }

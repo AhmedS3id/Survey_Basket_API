@@ -4,8 +4,13 @@ namespace Survey_Basket_API.Contract.Rquest
 {
     public record PollRequest
     (
-        [Required(ErrorMessage ="كتف امك اكتب التايتل")]
+        
+       int Id,
+       [Required(ErrorMessage ="كتف امك اكتب التايتل")]
         string Title,
-         string Description
+        string Summary,
+        bool IsPublished,
+        DateOnly StartsAt,
+        DateOnly EndsAt
     );
 }
