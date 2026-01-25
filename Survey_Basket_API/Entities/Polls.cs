@@ -1,6 +1,6 @@
 ﻿namespace Survey_Basket_API.Entities
 {
-    public sealed class Poll
+    public sealed class Poll:AuditTableEntity
     {
         public int Id { get; set; }
         public string Title { get; set; } = string.Empty;
