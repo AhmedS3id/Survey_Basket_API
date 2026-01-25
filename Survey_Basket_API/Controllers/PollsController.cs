@@ -1,4 +1,6 @@
 ﻿
+using Microsoft.AspNetCore.Authorization;
+using Survey_Basket_API.Contract.Poll;
 using System.Threading.Tasks;
 
 namespace Survey_Basket_API.Controllers
@@ -13,8 +15,9 @@ namespace Survey_Basket_API.Controllers
         //{
         //    _pollServices = pollServices;
         //}
+        [HttpGet("")]
+        [Authorize]
 
-        [HttpGet]
         public async Task<IActionResult> GetAll(CancellationToken cancellationToken = default)
         {
             var polls = await _pollServices.GetAllAsync();

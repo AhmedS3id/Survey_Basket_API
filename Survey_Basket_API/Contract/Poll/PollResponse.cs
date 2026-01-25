@@ -1,11 +1,10 @@
-﻿namespace Survey_Basket_API.Contract.Response
+﻿namespace Survey_Basket_API.Contract.Poll
 {
     public record PollResponse
     (
         int Id,
         string Title,
         string Summary ,
-        bool IsPublished ,
         DateOnly StartsAt ,
         DateOnly EndsAt
 

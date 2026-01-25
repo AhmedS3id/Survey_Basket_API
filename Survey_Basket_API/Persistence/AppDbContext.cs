@@ -1,11 +1,13 @@
 ﻿
 
-using Survey_Basket_API.Persistence.EntitiesConfiqurations;
+
+using Survey_Basket_API.Persistence.EntitiesConfiguration;
 using System.Reflection;
 
 namespace Survey_Basket_API.Persistence
 {
-    public class AppDbContext(DbContextOptions<AppDbContext> options ) : DbContext(options )
+    public class AppDbContext(DbContextOptions<AppDbContext> options ) 
+        : IdentityDbContext<ApplicationUser>(options )
     {
         public DbSet<Poll>Polls { get; set; }
 

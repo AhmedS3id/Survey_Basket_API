@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Survey_Basket_API.Persistence.EntitiesConfiqurations
+namespace Survey_Basket_API.Persistence.EntitiesConfiguration
 {
-    public class PollConfiqurations : IEntityTypeConfiguration<Poll>
+    public class PollConfiguration : IEntityTypeConfiguration<Poll>
     {
         public void Configure(EntityTypeBuilder<Poll> builder)
         {
