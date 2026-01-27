@@ -15,6 +15,20 @@ namespace Survey_Basket_API
         public static IServiceCollection Add_Dependencies(this IServiceCollection Services,
             IConfiguration Configuration)
         {
+            var AllowedOrigins = Configuration.GetSection("AllowedOrigins").Get<string[]>()!;
+
+            Services.AddCors(options => options.AddDefaultPolicy(builder => builder
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .WithOrigins(AllowedOrigins)
+            ));
+
+            //Services.AddCors(options => options.AddPolicy("MyPolicy",builder=>
+            //builder
+            //.WithOrigins(AllowedOrigins)
+            //.AllowAnyMethod()
+            //.AllowAnyHeader()
+            //));
             Services.AddControllers();
             Services.AddMapsterServicesConfig()
                 .AddAuthConfig( Configuration);
