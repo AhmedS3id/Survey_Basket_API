@@ -1,4 +1,5 @@
-﻿using Survey_Basket_API.Entities;
+﻿using Azure.Core;
+using Survey_Basket_API.Entities;
 using Survey_Basket_API.Errors;
 using Survey_Basket_API.Persistence;
 using System.Threading.Tasks;
@@ -20,8 +21,9 @@ namespace Survey_Basket_API.Services
             return poll is not null ? Result.success(poll.Adapt<PollResponse>()) : Result.Failure<PollResponse> (PollsErrors.InvalidPolls);
         }
 
-        public async Task<PollResponse> AddAsync(PollRequest poll, CancellationToken cancellationToken)
+        public async Task<PollResponse> AddAsync(PollRequest request, CancellationToken cancellationToken)
         {
+            var poll = request.Adapt<Poll>();
             await _context.AddAsync(poll, cancellationToken);
             await _context.SaveChangesAsync(cancellationToken);
             return poll.Adapt<PollResponse>() ;
@@ -52,7 +54,7 @@ namespace Survey_Basket_API.Services
 
         public async Task<Result> deleteAsync(int id, CancellationToken cancellationToken = default)
         {
-            var poll = await GetAsync(id, cancellationToken);
+            var poll = await _context.Polls.FindAsync(id, cancellationToken);
             if (poll != null)
             {
                 _context.Remove(poll);
