@@ -1,8 +1,10 @@
 ﻿
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.Extensions.Options;
 using Microsoft.VisualBasic.FileIO;
 using Survey_Basket_API.Authentication;
+using Survey_Basket_API.Errors;
 
 namespace Survey_Basket_API.Controllers
 {
@@ -21,7 +23,12 @@ namespace Survey_Basket_API.Controllers
         {
             var authResult = await _authServices.GetTokenAsync(request.Email, request.Password, cancellationToken);
 
-            return authResult is null ? BadRequest("Invalid email or password") : Ok(authResult);
+            return authResult.IsSuccess?Ok(authResult.value):Problem(statusCode: StatusCodes.Status400BadRequest, title: authResult.Error.Code, detail: authResult.Error.Description);
+           //install package onoff first
+            //return authResult.Match(
+            //    Ok,
+            //    error => Problem(statusCode: StatusCodes.Status400BadRequest, title: error.Code, detail: error.Description)
+            //);
         }
 
         [HttpPost("refresh")]
@@ -29,7 +36,7 @@ namespace Survey_Basket_API.Controllers
         {
             var authResult = await _authServices.GetRefreshTokenAsync(request.Token, request.RefreshToken, cancellationToken);
 
-            return authResult is null ? BadRequest("Invalid Token B") : Ok(authResult);
+            return authResult.IsSuccess ?  Ok(authResult.value): Problem(statusCode: StatusCodes.Status400BadRequest, title:authResult.Error.Code, detail: authResult.Error.Description);
         }
 
         [HttpPost("invoke-refresh-token")]
@@ -37,7 +44,7 @@ namespace Survey_Basket_API.Controllers
         {
             var InvokeResult = await _authServices.InvokeTokenAsync(request.Token, request.RefreshToken, cancellationToken);
 
-            return InvokeResult? Ok():BadRequest("Operation Faild") ;
+            return InvokeResult.IsSuccess ? Ok() :Problem(statusCode: StatusCodes.Status400BadRequest, title: InvokeResult.Error.Code, detail: InvokeResult.Error.Description);
         }
 
     }

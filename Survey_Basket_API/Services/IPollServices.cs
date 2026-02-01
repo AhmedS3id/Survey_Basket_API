@@ -6,12 +6,12 @@ namespace Survey_Basket_API.Services
     {
         Task <IEnumerable<Poll>> GetAllAsync(CancellationToken cancellationToken =default);
 
-        Task < Poll?> GetAsync(int id, CancellationToken cancellationToken = default);
+        Task <Result<PollResponse>> GetAsync(int id, CancellationToken cancellationToken = default);
 
-        Task < Poll> AddAsync(Poll poll, CancellationToken cancellationToken = default);
-         Task< bool >updateAsync(int id, Poll poll,CancellationToken cancellationToken=default);
+        Task<PollResponse> AddAsync(PollRequest poll, CancellationToken cancellationToken = default);
+        Task< Result >updateAsync(int id, PollRequest poll,CancellationToken cancellationToken=default);
 
-        Task< bool> deleteAsync(int id,CancellationToken cancellationToken=default);
-        Task< bool> TogglePublishStatusAsync(int id,CancellationToken cancellationToken=default);
+        Task<Result> deleteAsync(int id, CancellationToken cancellationToken = default);
+        Task<Result> TogglePublishStatusAsync(int id, CancellationToken cancellationToken = default);
     }
 }

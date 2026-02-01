@@ -10,4 +10,9 @@ global using Mapster;
 global using Microsoft.Extensions.Options;
 global using Survey_Basket_API.Contract.Poll;
 global using Survey_Basket_API.Contract.Authentication;
+global using Survey_Basket_API.Abstractions;
+global using Survey_Basket_API.Authentication;
+global using Survey_Basket_API.Errors;
+
+
 
