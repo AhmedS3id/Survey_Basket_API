@@ -49,7 +49,7 @@ namespace Survey_Basket_API.Services
 
             var user = await _UserManager.FindByIdAsync(user_Id);
             if (user is null)
-                return Result.Failure<AuthResponse>(UserCredentials.InvalidJwtToken));
+                return Result.Failure<AuthResponse>(UserCredentials.InvalidJwtToken);
 
             var UserRefreshToken = user.RefreshTokens
                 .SingleOrDefault(x => x.Token == RefreshToken && x.Is_Active);
@@ -77,7 +77,7 @@ namespace Survey_Basket_API.Services
         {
             var user_Id = _jwtProvider.ValidateToken(Token);
             if (user_Id is null)
-                return Result.Failure<AuthResponse>(UserCredentials.in);
+                return Result.Failure<AuthResponse>(UserCredentials.InvalidJwtToken);
 
             var user = await _UserManager.FindByIdAsync(user_Id);
             if (user is null)
