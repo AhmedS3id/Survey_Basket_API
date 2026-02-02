@@ -38,7 +38,7 @@ namespace Survey_Basket_API.Controllers
             //var response = result.Adapt<PollResponse>();
             //return Ok(response);
             return result.IsSuccess ? Ok(result.value) 
-            :Problem(statusCode:404,title:result.Error.Code,detail:result.Error.Description);
+            :result.ToProblem(StatusCodes.Status400BadRequest);
 
         }
 
@@ -56,14 +56,14 @@ namespace Survey_Basket_API.Controllers
         {
             var result = await _pollServices.updateAsync(id, request, cancellationToken);
 
-            return result.IsSuccess ? NoContent() : Problem(statusCode: 404, title: result.Error.Code, detail: result.Error.Description);
+            return result.IsSuccess ? NoContent() : result.ToProblem(StatusCodes.Status400BadRequest);
 
         }
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete([FromRoute] int id, CancellationToken cancellationToken)
         {
             var result = await _pollServices.deleteAsync(id, cancellationToken);
-           return result.IsSuccess?NoContent() : Problem(statusCode: 404, title: result.Error.Code, detail: result.Error.Description);   
+           return result.IsSuccess?NoContent() : result.ToProblem(StatusCodes.Status400BadRequest);   
         }
 
         [HttpPut("{id}/togglePublish")]
@@ -72,7 +72,7 @@ namespace Survey_Basket_API.Controllers
             var result = await _pollServices.TogglePublishStatusAsync(id, cancellationToken);
             if (!result.IsSuccess)
             {
-                return Problem(statusCode: 404, title: result.Error.Code, detail: result.Error.Description);
+                return result.ToProblem(StatusCodes.Status400BadRequest);
             }
             return NoContent();
         }
