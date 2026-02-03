@@ -45,10 +45,14 @@ namespace Survey_Basket_API
             //injection
             Services.AddScoped<IPollServices, PollServices>();
             Services.AddScoped<IAuthServices, AuthServices>();
+            
 
 
             Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
             Services.AddFluentValidationAutoValidation();
+
+            Services.AddExceptionHandler<GlobalExceptionHandler>();
+            Services.AddProblemDetails();
             return Services;
 
         }

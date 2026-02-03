@@ -45,9 +45,11 @@ namespace Survey_Basket_API.Controllers
         [HttpPost("")]
         public async Task<IActionResult> Add([FromBody] PollRequest request, CancellationToken cancellationToken = default)
         {
-            var Newpoll = await _pollServices.AddAsync(request,cancellationToken);
+            var result = await _pollServices.AddAsync(request,cancellationToken);
 
-            return  CreatedAtAction(nameof(Get), new { id = Newpoll.Id },Newpoll);
+            return result.IsSuccess?
+                CreatedAtAction(nameof(Get), new { id = result.value.Id },result.value)
+                : result.ToProblem(StatusCodes.Status409Conflict);
 
         }
 
@@ -56,7 +58,10 @@ namespace Survey_Basket_API.Controllers
         {
             var result = await _pollServices.updateAsync(id, request, cancellationToken);
 
-            return result.IsSuccess ? NoContent() : result.ToProblem(StatusCodes.Status400BadRequest);
+            if (result.Error == PollsErrors.DuplicatedTitle)
+                return result.ToProblem(StatusCodes.Status409Conflict);
+
+            return result.IsSuccess ? NoContent() : result.ToProblem(StatusCodes.Status404NotFound);
 
         }
         [HttpDelete("{id}")]

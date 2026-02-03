@@ -4,6 +4,7 @@
     {
         
       public static readonly Error InvalidPolls = new("Polls Not Found", "No Poll was found With given id");
+      public static readonly Error DuplicatedTitle = new("Duplicated Title", "Another Polls With The same title");
         
     }
 }
