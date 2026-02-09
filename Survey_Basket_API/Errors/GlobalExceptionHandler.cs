@@ -7,7 +7,7 @@ namespace Survey_Basket_API.Errors
     {
         private readonly ILogger _logger = logger;
 
-        public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
+        public  async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
         {
             _logger.LogError(exception, "Something went wrong {message}",exception.Message);
             var ProblemDetails = new ProblemDetails
