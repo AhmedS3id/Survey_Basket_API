@@ -13,6 +13,9 @@ global using Survey_Basket_API.Contract.Authentication;
 global using Survey_Basket_API.Abstractions;
 global using Survey_Basket_API.Authentication;
 global using Survey_Basket_API.Errors;
+global using Microsoft.AspNetCore.Authorization;
+global using Survey_Basket_API.Extensions;
+
 
 
 

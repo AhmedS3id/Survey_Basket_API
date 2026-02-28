@@ -24,7 +24,7 @@ namespace Survey_Basket_API.Controllers
             var authResult = await _authServices.GetTokenAsync(request.Email, request.Password, cancellationToken);
 
             return authResult.IsSuccess ? Ok(authResult.value)
-                : authResult.ToProblem(StatusCodes.Status400BadRequest);
+                : authResult.ToProblem();
            //install package one off first
             //return authResult.Match(
             //    Ok,
@@ -37,7 +37,7 @@ namespace Survey_Basket_API.Controllers
         {
             var authResult = await _authServices.GetRefreshTokenAsync(request.Token, request.RefreshToken, cancellationToken);
 
-            return authResult.IsSuccess ?  Ok(authResult.value):authResult.ToProblem(StatusCodes.Status400BadRequest);
+            return authResult.IsSuccess ?  Ok(authResult.value):authResult.ToProblem();
         }
 
         [HttpPost("invoke-refresh-token")]
@@ -45,7 +45,7 @@ namespace Survey_Basket_API.Controllers
         {
             var InvokeResult = await _authServices.InvokeTokenAsync(request.Token, request.RefreshToken, cancellationToken);
 
-            return InvokeResult.IsSuccess ? Ok() : InvokeResult.ToProblem(StatusCodes.Status400BadRequest);
+            return InvokeResult.IsSuccess ? Ok() : InvokeResult.ToProblem();
         }
 
     }

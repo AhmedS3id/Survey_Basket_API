@@ -21,9 +21,14 @@ namespace Survey_Basket_API.Controllers
 
         public async Task<IActionResult> GetAll(CancellationToken cancellationToken = default)
         {
-            var polls = await _pollServices.GetAllAsync();
-            var Response = polls.Adapt<IEnumerable<PollResponse>>();
-            return Ok(Response);
+            var polls = await _pollServices.GetAllAsync(cancellationToken);
+            return Ok(polls);
+        }
+        [HttpGet("current")]
+        public async Task<IActionResult> GetCurrent(CancellationToken cancellationToken = default)
+        {
+            var polls = await _pollServices.GetCurrentAsync(cancellationToken);
+            return Ok(polls);
         }
 
         [HttpGet("{id}")]
@@ -38,7 +43,7 @@ namespace Survey_Basket_API.Controllers
             //var response = result.Adapt<PollResponse>();
             //return Ok(response);
             return result.IsSuccess ? Ok(result.value) 
-            :result.ToProblem(StatusCodes.Status400BadRequest);
+            :result.ToProblem();
 
         }
 
@@ -49,26 +54,23 @@ namespace Survey_Basket_API.Controllers
 
             return result.IsSuccess?
                 CreatedAtAction(nameof(Get), new { id = result.value.Id },result.value)
-                : result.ToProblem(StatusCodes.Status409Conflict);
+                : result.ToProblem();
 
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> Update([FromRoute] int id, [FromBody] PollRequest request, CancellationToken cancellationToken)
         {
-            var result = await _pollServices.updateAsync(id, request, cancellationToken);
+            var result = await _pollServices.UpdateAsync(id, request, cancellationToken);
 
-            if (result.Error == PollsErrors.DuplicatedTitle)
-                return result.ToProblem(StatusCodes.Status409Conflict);
-
-            return result.IsSuccess ? NoContent() : result.ToProblem(StatusCodes.Status404NotFound);
+            return result.IsSuccess ? NoContent() : result.ToProblem();
 
         }
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete([FromRoute] int id, CancellationToken cancellationToken)
         {
-            var result = await _pollServices.deleteAsync(id, cancellationToken);
-           return result.IsSuccess?NoContent() : result.ToProblem(StatusCodes.Status400BadRequest);   
+            var result = await _pollServices.DeleteAsync(id, cancellationToken);
+           return result.IsSuccess?NoContent() : result.ToProblem();   
         }
 
         [HttpPut("{id}/togglePublish")]
@@ -77,7 +79,7 @@ namespace Survey_Basket_API.Controllers
             var result = await _pollServices.TogglePublishStatusAsync(id, cancellationToken);
             if (!result.IsSuccess)
             {
-                return result.ToProblem(StatusCodes.Status400BadRequest);
+                return result.ToProblem();
             }
             return NoContent();
         }

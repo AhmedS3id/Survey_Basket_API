@@ -14,7 +14,7 @@ namespace Survey_Basket_API.Controllers
         public async Task<IActionResult> GetAll([FromRoute] int pollId,CancellationToken cancellationToken)
         {
             var result = await _questionServices.GetAllAsync(pollId, cancellationToken);
-            return result.IsSuccess ? Ok(result.value) : result.ToProblem(StatusCodes.Status404NotFound);     
+            return result.IsSuccess ? Ok(result.value) : result.ToProblem();     
         }
 
 
@@ -22,28 +22,23 @@ namespace Survey_Basket_API.Controllers
       public async Task< IActionResult> Get([FromRoute] int pollId, [FromRoute]int id ,CancellationToken cancellationToken)
         {
             var result = await _questionServices.GetAsync(pollId,id, cancellationToken);
-            return result.IsSuccess ? Ok(result.value) : result.ToProblem(StatusCodes.Status404NotFound);
+            return result.IsSuccess ? Ok(result.value) : result.ToProblem();
         }
 
         [HttpPost("")]
        public async Task<IActionResult> Add([FromRoute] int pollId ,[FromBody] QuestionRequest request,CancellationToken cancellationToken)
         {
             var result = await _questionServices.AddAsync(pollId, request, cancellationToken);
-            if (result.Error == PollsErrors.InvalidPolls)
-                return result.ToProblem(StatusCodes.Status404NotFound);
 
             return result.IsSuccess ? CreatedAtAction(nameof(Get), new { pollId, result.value.Id }, result.value)
-                : result.ToProblem(StatusCodes.Status409Conflict);
+                : result.ToProblem();
         }
         [HttpPut ("{id}")]
         public async Task<IActionResult> Update([FromRoute] int pollId,int id, [FromBody] QuestionRequest request, CancellationToken cancellationToken)
         {
             var result = await _questionServices.UpdateAsync(pollId,id, request, cancellationToken);
-            if (result.Error == PollsErrors.InvalidPolls)
-                return result.ToProblem(StatusCodes.Status404NotFound);
 
-            return result.IsSuccess ? NoContent()
-                : result.ToProblem(StatusCodes.Status409Conflict);
+            return result.IsSuccess?NoContent():result.ToProblem();
         }
 
 
@@ -52,7 +47,7 @@ namespace Survey_Basket_API.Controllers
         {
             var result = await _questionServices.ToggleStatusAsync(pollId, id, cancellationToken);
 
-            return result.IsSuccess ? NoContent() : result.ToProblem(StatusCodes.Status404NotFound);
+            return result.IsSuccess ? NoContent() : result.ToProblem();
         }
     }
 }

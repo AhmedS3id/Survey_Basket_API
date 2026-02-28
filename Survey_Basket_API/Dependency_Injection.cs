@@ -46,6 +46,7 @@ namespace Survey_Basket_API
             Services.AddScoped<IPollServices, PollServices>();
             Services.AddScoped<IAuthServices, AuthServices>();
             Services.AddScoped<IQuestionServices, QuestionService>();
+            Services.AddScoped<IVoteServices, VoteServices>();
             
 
 

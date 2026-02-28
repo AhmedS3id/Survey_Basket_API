@@ -10,9 +10,18 @@ namespace Survey_Basket_API.Services
     {
         private readonly AppDbContext _context = context;
        
-        public async Task<IEnumerable<Poll>> GetAllAsync(CancellationToken cancellationToken ) =>
-            await _context.Polls.AsNoTracking().ToListAsync( cancellationToken);
+        public async Task<IEnumerable<PollResponse>> GetAllAsync(CancellationToken cancellationToken ) =>
+            await _context.Polls
+            .AsNoTracking()
+            .ProjectToType<PollResponse>()
+            .ToListAsync( cancellationToken);
 
+        public async Task<IEnumerable<PollResponse>> GetCurrentAsync(CancellationToken cancellationToken = default) =>
+            await _context.Polls
+            .Where(x => x.IsPublished && x.StartsAt <= DateOnly.FromDateTime(DateTime.UtcNow) && x.EndsAt >= DateOnly.FromDateTime(DateTime.UtcNow))
+            .AsNoTracking()
+            .ProjectToType<PollResponse>()
+            .ToListAsync(cancellationToken);
 
 
         public async Task<Result<PollResponse>> GetAsync(int id, CancellationToken cancellationToken )
@@ -23,7 +32,7 @@ namespace Survey_Basket_API.Services
 
         public async Task<Result<PollResponse>> AddAsync(PollRequest request, CancellationToken cancellationToken)
         {
-            var IsExistingTitle = await _context.Polls.AnyAsync(x=>x.Title==request.Title);
+            var IsExistingTitle = await _context.Polls.AnyAsync(x =>x.Title==request.Title, cancellationToken: cancellationToken);
             if (IsExistingTitle)
                 return Result.Failure<PollResponse>(PollsErrors.DuplicatedTitle);
 
@@ -35,7 +44,7 @@ namespace Survey_Basket_API.Services
 
         }
 
-        public async Task<Result> updateAsync(int id, PollRequest request, CancellationToken cancellationToken)
+        public async Task<Result> UpdateAsync(int id, PollRequest request, CancellationToken cancellationToken)
         {
             var CurrentPoll = await _context.Polls.FindAsync(id, cancellationToken);
             if (CurrentPoll is null)
@@ -57,7 +66,7 @@ namespace Survey_Basket_API.Services
         }
 
 
-        public async Task<Result> deleteAsync(int id, CancellationToken cancellationToken = default)
+        public async Task<Result> DeleteAsync(int id, CancellationToken cancellationToken = default)
         {
             var poll = await _context.Polls.FindAsync(id, cancellationToken);
             if (poll != null)

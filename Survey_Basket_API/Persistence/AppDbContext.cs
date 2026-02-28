@@ -13,6 +13,8 @@ namespace Survey_Basket_API.Persistence
         public DbSet<Poll>Polls { get; set; }
         public DbSet<Answer>Answers { get; set; }
         public DbSet<Question>Questions { get; set; }
+        public DbSet<Vote>Votes { get; set; }
+        public DbSet<VoteAnswer> VoteAnswers { get; set; }
         public IHttpContextAccessor _HttpContextAccessor  = httpContextAccessor;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -29,7 +31,7 @@ namespace Survey_Basket_API.Persistence
         }
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
-            var CurrentUserId = _HttpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var CurrentUserId = _HttpContextAccessor.HttpContext?.User.GetUserId();
             var entries = ChangeTracker.Entries<AuditTableEntity>();
             foreach (var entityEntry in entries)
             {

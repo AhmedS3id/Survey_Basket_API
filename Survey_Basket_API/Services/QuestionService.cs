@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Survey_Basket_API.Contract.Answers;
 using Survey_Basket_API.Contract.Questions;
 using Survey_Basket_API.Entities;
 using Survey_Basket_API.Persistence;
@@ -22,6 +23,29 @@ namespace Survey_Basket_API.Services
                 return Result.Failure<QuestionResponse>(PollsErrors.InvalidPolls);
 
             return Result.success(question);
+        }
+        public async Task<Result<IEnumerable<QuestionResponse>>> GetCurrentAsync(int PollId, string UserId, CancellationToken cancellationToken = default)
+        {
+            var hasVot = await _context.Votes.AnyAsync(x => x.PollId == PollId && x.UserId == UserId,cancellationToken);
+            if (hasVot)
+                return Result.Failure<IEnumerable<QuestionResponse>>(VotesErrors.DuplicatedVote);
+
+            var pollExist = await _context.Polls.AnyAsync(x => x.Id == PollId && x.IsPublished && x.StartsAt <= DateOnly.FromDateTime(DateTime.UtcNow) && x.EndsAt >= DateOnly.FromDateTime(DateTime.UtcNow));
+            if (!pollExist)
+                return Result.Failure<IEnumerable<QuestionResponse>>(PollsErrors.InvalidPolls);
+
+            var Question = await _context.Questions
+                .Where(x=>x.PollId==PollId&&x.IsActive)
+                .Include(x=>x.Answers)
+                .Select(q=>new QuestionResponse(
+                    q.Id,
+                    q.Content,
+                    q.Answers.Where(x=>x.IsActive).Select(a=>new AnswerResponse(a.Id,a.Content))
+                    ))
+                .AsNoTracking()
+                .ToListAsync(cancellationToken);
+            return Result.success<IEnumerable<QuestionResponse>>(Question);
+
         }
         public async Task<Result<IEnumerable<QuestionResponse>>> GetAllAsync(int PollId, CancellationToken cancellationToken = default)
         {
