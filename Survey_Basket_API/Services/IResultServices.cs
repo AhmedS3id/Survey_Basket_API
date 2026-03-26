@@ -6,5 +6,6 @@ namespace Survey_Basket_API.Services
     {
         public Task<Result<PollVoteResponse>> GetPollVotesAsync(int pollId, CancellationToken cancellationToken);
         public Task<Result<IEnumerable<VotePerDayResponse>>> GetVotesPerDayAsync(int pollId, CancellationToken cancellationToken);
+        public Task<Result<IEnumerable<VotePerQuestionResponse>>> GetVotesPerQuestionAsync(int pollId, CancellationToken cancellationToken = default);
     }
 }

@@ -22,5 +22,13 @@ namespace Survey_Basket_API.Controllers
             var result = await _resultServices.GetVotesPerDayAsync(pollId, cancellationToken);
             return result.IsSuccess ? Ok(result.value) : result.ToProblem();
         }
+
+        [HttpGet("votes-per-question")]
+        public async Task<IActionResult> VotesPerQuestion([FromRoute] int pollId, CancellationToken cancellationToken)
+        {
+            var result = await _resultServices.GetVotesPerQuestionAsync(pollId, cancellationToken);
+
+            return result.IsSuccess ? Ok(result.value) : result.ToProblem();
+        }
     }
 }

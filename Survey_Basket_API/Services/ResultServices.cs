@@ -49,5 +49,28 @@ namespace Survey_Basket_API.Services
 
             return Result.success<IEnumerable<VotePerDayResponse>>(votesPerDay);
         }
+
+        public async Task<Result<IEnumerable<VotePerQuestionResponse>>> GetVotesPerQuestionAsync(int pollId, CancellationToken cancellationToken = default)
+        {
+            var pollIsExists = await _context.Polls.AnyAsync(x => x.Id == pollId, cancellationToken: cancellationToken);
+
+            if (!pollIsExists)
+                return Result.Failure<IEnumerable<VotePerQuestionResponse>>(PollsErrors.InvalidPolls);
+
+            var VotePerQuestion = await _context.VoteAnswers 
+                .Where(x=>x.Vote.PollId==pollId)
+                .Select(y=>new VotePerQuestionResponse(
+                    y.Question.Content,
+                    y.Question.Votes
+                    .GroupBy(x => new { x.AnswerId, AnswerContent = x.Answer.Content })
+                    .Select(g=> new VotePerAnswerResponse(
+                    g.Key.AnswerContent,
+                    g.Count()
+                    ))
+                    )).ToListAsync(cancellationToken);
+
+            return Result.success<IEnumerable<VotePerQuestionResponse>>(VotePerQuestion);
+
+        }
     }
 }
