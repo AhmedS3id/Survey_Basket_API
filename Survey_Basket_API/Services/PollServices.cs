@@ -1,8 +1,4 @@
-﻿using Azure.Core;
-using Survey_Basket_API.Entities;
-using Survey_Basket_API.Errors;
-using Survey_Basket_API.Persistence;
-using System.Threading.Tasks;
+﻿using Survey_Basket_API.Persistence;
 
 namespace Survey_Basket_API.Services
 {

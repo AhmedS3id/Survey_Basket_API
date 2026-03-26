@@ -1,8 +1,4 @@
-﻿
-using Microsoft.EntityFrameworkCore;
-using Survey_Basket_API.Contract.Questions;
-using Survey_Basket_API.Contract.Votes;
-using Survey_Basket_API.Entities;
+﻿using Survey_Basket_API.Contract.Votes;
 using Survey_Basket_API.Persistence;
 
 namespace Survey_Basket_API.Services
@@ -17,12 +13,15 @@ namespace Survey_Basket_API.Services
             if (hasVot)
                 return Result.Failure(VotesErrors.DuplicatedVote);
 
-            var pollExist = await _context.Polls.AnyAsync(x => x.Id == pollId && x.IsPublished && x.StartsAt <= DateOnly.FromDateTime(DateTime.UtcNow) && x.EndsAt >= DateOnly.FromDateTime(DateTime.UtcNow));
+            var pollExist = await _context.Polls.AnyAsync(x => x.Id == pollId &&
+            x.IsPublished && x.StartsAt <= DateOnly.FromDateTime(DateTime.UtcNow) &&
+            x.EndsAt >= DateOnly.FromDateTime(DateTime.UtcNow), cancellationToken: cancellationToken);
+
             if (!pollExist)
                 return Result.Failure(PollsErrors.InvalidPolls);
 
             var availableQuestion = await _context.Questions
-                .Where(x=>x.PollId==pollId&&x.IsActive)
+                .Where(x => x.PollId == pollId && x.IsActive)
                 .Select(x=>x.Id)
                 .ToListAsync(cancellationToken);
             if (!request.Answer.Select(x=>x.QuestionId).SequenceEqual(availableQuestion))

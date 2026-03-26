@@ -1,6 +1,5 @@
 ﻿
 using Microsoft.AspNetCore.Identity;
-using Survey_Basket_API.Errors;
 using System.Security.Cryptography;
 
 namespace Survey_Basket_API.Services
