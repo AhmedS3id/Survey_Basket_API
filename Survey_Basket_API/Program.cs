@@ -1,8 +1,17 @@
 using Microsoft.Extensions.DependencyInjection;
+using Serilog;
 using Survey_Basket_API;
 using Survey_Basket_API.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Host.UseSerilog((context,configurations)=>
+{
+    configurations.ReadFrom.Configuration(context.Configuration);
+    //configurations
+    //.MinimumLevel.Information()
+    //.WriteTo.Console();
+});
 
 // Add services to the container.
 
@@ -19,6 +28,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseSerilogRequestLogging();
 
 app.UseCors();
 
