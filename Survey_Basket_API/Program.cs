@@ -17,6 +17,8 @@ builder.Host.UseSerilog((context,configurations)=>
 
 builder.Services.Add_Dependencies(builder.Configuration);
 
+builder.Services.AddMemoryCache();
+
 
 var app = builder.Build();
 
