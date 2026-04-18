@@ -10,8 +10,6 @@
                 .EmailAddress();
 
             RuleFor(x => x.Password).NotEmpty();
-         
-
 
         }
       

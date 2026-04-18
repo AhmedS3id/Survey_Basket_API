@@ -7,7 +7,7 @@ using Survey_Basket_API.Persistence;
 
 namespace Survey_Basket_API.Services
 {
-    public class QuestionService(AppDbContext context, HybridCache hybridCache, ILogger logger) : IQuestionServices
+    public class QuestionService(AppDbContext context, HybridCache hybridCache, ILogger<QuestionService> logger) : IQuestionServices
     {
         private readonly AppDbContext _context = context;
         private readonly HybridCache _hybridCache = hybridCache;
@@ -60,7 +60,7 @@ namespace Survey_Basket_API.Services
         {
             var IsPollExist = await _context.Polls.AnyAsync(x => x.Id == PollId, cancellationToken: cancellationToken);
             if (!IsPollExist)
-                return Abstractions.Result.Failure<IEnumerable<QuestionResponse>>(PollsErrors.InvalidPolls);
+                return Result.Failure<IEnumerable<QuestionResponse>>(PollsErrors.InvalidPolls);
             var question = await _context.Questions
                 .Where(x => x.PollId == PollId)
                 .Include(x => x.Answers)

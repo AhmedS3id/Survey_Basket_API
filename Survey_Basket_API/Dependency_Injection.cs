@@ -2,9 +2,11 @@
 using MapsterMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.IdentityModel.Tokens;
 using Survey_Basket_API.Authentication;
 using Survey_Basket_API.Persistence;
+using Survey_Basket_API.Settings;
 using System.Reflection;
 using System.Text;
 
@@ -48,6 +50,8 @@ namespace Survey_Basket_API
             Services.AddScoped<IQuestionServices, QuestionService>();
             Services.AddScoped<IVoteServices, VoteServices>();
             Services.AddScoped<IResultServices, ResultServices>();
+            Services.AddScoped<IEmailSender, EmailServices>();
+
             
 
 
@@ -56,6 +60,7 @@ namespace Survey_Basket_API
 
             Services.AddExceptionHandler<GlobalExceptionHandler>();
             Services.AddProblemDetails();
+            Services.Configure<MailSettings>(Configuration.GetSection(nameof(MailSettings)));
             return Services;
 
         }
@@ -79,8 +84,11 @@ namespace Survey_Basket_API
             var JwtSettings = Configuration.GetSection("Jwt").Get<JwtOptions>();
 
             services.AddSingleton<IJwtProvider, JwtProvider>();   
+
             services.AddIdentity<ApplicationUser, IdentityRole>()
-                  .AddEntityFrameworkStores<AppDbContext>();
+                  .AddEntityFrameworkStores<AppDbContext>()
+                  .AddDefaultTokenProviders();
+
             services.AddAuthentication(static option =>
             {
                 option.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -98,8 +106,13 @@ namespace Survey_Basket_API
                     ValidIssuer = JwtSettings?.Issuer,
                     ValidAudience = JwtSettings?.Audience
                 };
-            }
-            );
+            });
+            services.Configure<IdentityOptions>(options =>
+            {
+                options.Password.RequiredLength = 8;
+                options.SignIn.RequireConfirmedEmail = true;
+                options.User.RequireUniqueEmail = true;
+            });
             var test = new
             {
                 IssuerSigningKey = Configuration["Jwt:Key"]!,
@@ -110,7 +123,6 @@ namespace Survey_Basket_API
             
             return services;
         }
-
 
     }
 }

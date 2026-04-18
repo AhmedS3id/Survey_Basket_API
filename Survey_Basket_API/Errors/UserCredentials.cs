@@ -12,5 +12,17 @@ namespace Survey_Basket_API.Errors
 
         public static readonly Error InvalidRefreshToken =
             new("User.InvalidRefreshToken", "Invalid refresh token", StatusCodes.Status401Unauthorized);
+
+        public static readonly Error InvalidEmail =
+            new("User.InvalidEmail", "Invalid Email ,Email is exist", StatusCodes.Status409Conflict);
+
+        public static readonly Error EmailNotConfirmed =
+          new("User.EmailNotConfirmed", "EmailNotConfirmed", StatusCodes.Status401Unauthorized);
+
+        public static readonly Error InvalidCode =
+          new("User.InvalidCode", "Invalid Code", StatusCodes.Status401Unauthorized);
+
+        public static readonly Error DuplicatedConfirmed =
+          new("User.DuplicatedConfirmed", " Email already confirmed ", StatusCodes.Status401Unauthorized);
     }
 }

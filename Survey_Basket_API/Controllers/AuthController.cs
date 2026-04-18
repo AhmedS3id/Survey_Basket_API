@@ -48,5 +48,29 @@ namespace Survey_Basket_API.Controllers
             return InvokeResult.IsSuccess ? Ok() : InvokeResult.ToProblem();
         }
 
+        [HttpPost("register")]
+        public async Task<IActionResult> Register([FromBody] RegisterRequest request, CancellationToken cancellationToken)
+        {
+            var Result = await _authServices.RegisterAsync( request, cancellationToken);
+
+            return Result.IsSuccess ? Ok() : Result.ToProblem();
+        }
+
+        [HttpPost("confirmed-email")]
+        public async Task<IActionResult> EmailConfirmed([FromBody] ConfirmEmailRequest request)
+        {
+            var Result = await _authServices.ConfirmationEmail( request);
+
+            return Result.IsSuccess ? Ok() : Result.ToProblem();
+        }
+
+        [HttpPost("resend-email-confirm")]
+        public async Task<IActionResult> ResendEmailConfirmation([FromBody] ResendConfirmationEmailRequest request)
+        {
+            var Result = await _authServices.ResendConfirmationEmail( request);
+
+            return Result.IsSuccess ? Ok() : Result.ToProblem();
+        }
+
     }
 }
