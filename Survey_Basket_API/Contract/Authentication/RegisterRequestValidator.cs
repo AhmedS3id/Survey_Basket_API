@@ -2,9 +2,9 @@
 
 namespace Survey_Basket_API.Contract.Authentication
 {
-    public class RegisterRequestValidator : AbstractValidator<RegisterRequest>
+    public class UpdateUserProfileUserValidator : AbstractValidator<RegisterRequest>
     {
-        public RegisterRequestValidator()
+        public UpdateUserProfileUserValidator()
         {
             RuleFor(x=>x.FirstName).NotEmpty()
                 .Length(3,100);

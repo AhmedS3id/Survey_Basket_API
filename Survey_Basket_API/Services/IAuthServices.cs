@@ -9,5 +9,7 @@ namespace Survey_Basket_API.Services
         Task<Result> RegisterAsync(RegisterRequest request, CancellationToken cancellationToken);
         Task<Result> ConfirmationEmail(ConfirmEmailRequest request);
         Task<Result> ResendConfirmationEmail(ResendConfirmationEmailRequest request);
+        Task<Result> ForgetPasswordAsync(string Email);
+        Task<Result> ResetPasswordAsync(ResetPasswordRequest request);
     }
 }

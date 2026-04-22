@@ -12,7 +12,7 @@ namespace Survey_Basket_API.Persistence.EntitiesConfiguration
                 .WithOwner()
                 .HasForeignKey("UserId");
 
-            builder.Property(x => x.FirsName).HasMaxLength(100);
+            builder.Property(x => x.FirstName).HasMaxLength(100);
             builder.Property(x => x.LastName).HasMaxLength(100);
 
         }

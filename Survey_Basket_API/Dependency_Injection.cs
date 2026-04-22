@@ -52,6 +52,7 @@ namespace Survey_Basket_API
             services.AddScoped<IQuestionServices, QuestionService>();
             services.AddScoped<IVoteServices, VoteServices>();
             services.AddScoped<IResultServices, ResultServices>();
+            services.AddScoped<IUserService, UserService>();
             services.AddScoped<IEmailSender, EmailServices>();
 
             services.AddBackgroundJobsConfig(configuration);

@@ -41,7 +41,7 @@ namespace Survey_Basket_API.Services
                 {
                     var PlaceHolders = new Dictionary<string, string>
                     {
-                        {"{name}",user.FirsName },
+                        {"{name}",user.FirstName },
                         {"{pollTill}",poll.Title },
                         {"{endDate}",poll.EndsAt.ToString() },
                         {"{url}",$"{Origin}/polls/start/{poll.Id}" }

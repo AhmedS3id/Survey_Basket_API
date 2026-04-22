@@ -5,6 +5,7 @@ global using Survey_Basket_API.Services;
 global using System.Diagnostics.Contracts;
 global using Microsoft.EntityFrameworkCore;
 global using FluentValidation;
+global using Survey_Basket_API.Contract.Users;
 global using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 global using Mapster;
 global using Microsoft.Extensions.Options;

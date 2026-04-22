@@ -42,7 +42,7 @@ namespace Survey_Basket_API.Services
                     ExpireOn = ExpirationDate
                 });
                 await _UserManager.UpdateAsync(user);
-                var response = new AuthResponse(user.Id, user.Email, user.FirsName, user.LastName, token, expireIn, RefreshToken, ExpirationDate);
+                var response = new AuthResponse(user.Id, user.Email, user.FirstName, user.LastName, token, expireIn, RefreshToken, ExpirationDate);
                 return Result.success(response);
             }
             return Result.Failure<AuthResponse>(result.IsNotAllowed?UserCredentials.EmailNotConfirmed:UserCredentials.InvalidCredentials);
@@ -83,8 +83,6 @@ namespace Survey_Basket_API.Services
                 return Result.Failure(UserCredentials.InvalidEmail);
 
             var user = request.Adapt<ApplicationUser>();
-            user.FirsName=request.FirstName;
-
             var result = await _UserManager.CreateAsync(user,request.Password);
 
             if (result.Succeeded)
@@ -152,7 +150,7 @@ namespace Survey_Basket_API.Services
                 ExpireOn = ExpirationDate
             });
             await _UserManager.UpdateAsync(user);
-            var result= new AuthResponse(user.Id, user.Email, user.FirsName, user.LastName, Newtoken, expireIn, newRefreshToken, ExpirationDate);
+            var result= new AuthResponse(user.Id, user.Email, user.FirstName, user.LastName, Newtoken, expireIn, newRefreshToken, ExpirationDate);
             return Result.success(result);
 
         }
@@ -177,17 +175,74 @@ namespace Survey_Basket_API.Services
             return Result.success();
         }
 
+        public async Task<Result> ForgetPasswordAsync(string Email)
+        {
+            var user = await _UserManager.FindByEmailAsync(Email);
+            if (user is null)
+                return Result.success();
+
+            if (!user.EmailConfirmed)
+                return Result.Failure(UserCredentials.EmailNotConfirmed);
+
+            var code = await _UserManager.GeneratePasswordResetTokenAsync(user);
+            code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+            _logger.LogInformation("Confirmation code : {code}", code);
+
+            await SendForgetPasswordEmail(user, code);
+
+            return Result.success();
+
+        }
+
+        public async Task<Result> ResetPasswordAsync(ResetPasswordRequest request)
+        {
+            var user = await _UserManager.FindByEmailAsync(request.Email);
+            if (user is null || !user.EmailConfirmed)
+                return Result.Failure(UserCredentials.EmailNotConfirmed);
+
+            IdentityResult result;
+
+            try
+            {
+                var code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(request.Code));
+                result = await _UserManager.ResetPasswordAsync(user, code, request.NewPassword);
+
+            }
+            catch (FormatException)
+            {
+                return Result.Failure(UserCredentials.InvalidCode);
+            }
+            if (result.Succeeded)
+                return Result.success();
+
+            var error = result.Errors.First();
+            return Result.Failure(new Error(error.Code, error.Description, StatusCodes.Status400BadRequest));
+        }
+
         private async Task SendConfirmationEmail(ApplicationUser user,string code)
         {
             var Origin = _httpContextAccessor.HttpContext?.Request.Headers.Origin;
 
             var EmailBody = EmailBodyBuilder.GenerateEmailBody("EmailConfirmation", new Dictionary<string, string>
                 {
-                    {"{{UserName}}",user.FirsName },
+                    {"{{UserName}}",user.FirstName },
                     {"{{AppName}}" ,"Survey Basket"},
                     {"{{ConfirmationLink}}",$"{Origin}/auth/emailConfirmation?userId={user.Id}&code={code}" }
                 });
             BackgroundJob.Enqueue(() => _emailSender.SendEmailAsync(user.Email!, "✅Survey Basket : Email Confirmation", EmailBody));
+            await Task.CompletedTask;
+        }
+        private async Task SendForgetPasswordEmail(ApplicationUser user,string code)
+        {
+            var Origin = _httpContextAccessor.HttpContext?.Request.Headers.Origin;
+
+            var EmailBody = EmailBodyBuilder.GenerateEmailBody("ForgetPassword", new Dictionary<string, string>
+                {
+                    {"{{name}}",user.FirstName },
+                    { "{{action_url}}", $"{Origin}/auth/forgetPassword?email={user.Email}&code={code}" }  
+                }
+            );
+            BackgroundJob.Enqueue(() => _emailSender.SendEmailAsync(user.Email!, "✅ Survey Basket: Change Password ", EmailBody));
             await Task.CompletedTask;
         }
     }

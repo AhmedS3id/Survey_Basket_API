@@ -17,7 +17,7 @@ namespace Survey_Basket_API.Services
                 .Select(x => new PollVoteResponse(
                     x.Title,
                     x.Votes.Select(v => new VoteResponse(
-                        $"{v.User.FirsName} {v.User.LastName}",
+                        $"{v.User.FirstName} {v.User.LastName}",
                         v.SubmittedOn,
                         v.VoteAnswer.Select(a => new QuestionAnswerResponse(
                             a.Question.Content,

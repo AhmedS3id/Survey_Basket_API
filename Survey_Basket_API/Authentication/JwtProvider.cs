@@ -17,7 +17,7 @@ namespace Survey_Basket_API.Authentication
             Claim[] claims = [
                 new(JwtRegisteredClaimNames.Sub,user.Id),
                 new(JwtRegisteredClaimNames.Email,user.Email!),
-                new(JwtRegisteredClaimNames.GivenName,user.FirsName),
+                new(JwtRegisteredClaimNames.GivenName,user.FirstName),
                 new(JwtRegisteredClaimNames.FamilyName,user.LastName),
                 new(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString())
                 ];
