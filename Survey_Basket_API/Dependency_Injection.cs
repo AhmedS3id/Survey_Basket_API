@@ -1,4 +1,5 @@
 ﻿using FluentValidation.AspNetCore;
+using Hangfire;
 using MapsterMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -14,12 +15,12 @@ namespace Survey_Basket_API
 {
     public static class Dependency_Injection
     {
-        public static IServiceCollection Add_Dependencies(this IServiceCollection Services,
-            IConfiguration Configuration)
+        public static IServiceCollection Add_Dependencies(this IServiceCollection services,
+            IConfiguration configuration)
         {
-            var AllowedOrigins = Configuration.GetSection("AllowedOrigins").Get<string[]>()!;
+            var AllowedOrigins = configuration.GetSection("AllowedOrigins").Get<string[]>()!;
 
-            Services.AddCors(options => options.AddDefaultPolicy(builder => builder
+            services.AddCors(options => options.AddDefaultPolicy(builder => builder
             .AllowAnyHeader()
             .AllowAnyMethod()
             .WithOrigins(AllowedOrigins)
@@ -31,40 +32,41 @@ namespace Survey_Basket_API
             //.AllowAnyMethod()
             //.AllowAnyHeader()
             //));
-            Services.AddControllers();
-            Services.AddMapsterServicesConfig()
-                .AddAuthConfig( Configuration);
+            services.AddControllers();
+            services.AddMapsterServicesConfig()
+                .AddAuthConfig(configuration);
 
-         var ConnectionString = Configuration.GetConnectionString("DefaultConnection") ??
+         var ConnectionString = configuration.GetConnectionString("DefaultConnection") ??
          throw new InvalidOperationException("Connection String 'DefaultConnection' Is Not Found .");
 
-            Services.AddDbContext<AppDbContext>
+            services.AddDbContext<AppDbContext>
               (options => options.UseSqlServer(ConnectionString));
 
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-            Services.AddOpenApi();
+            services.AddOpenApi();
 
             //injection
-            Services.AddScoped<IPollServices, PollServices>();
-            Services.AddScoped<IAuthServices, AuthServices>();
-            Services.AddScoped<IQuestionServices, QuestionService>();
-            Services.AddScoped<IVoteServices, VoteServices>();
-            Services.AddScoped<IResultServices, ResultServices>();
-            Services.AddScoped<IEmailSender, EmailServices>();
+            services.AddScoped<IPollServices, PollServices>();
+            services.AddScoped<IAuthServices, AuthServices>();
+            services.AddScoped<INotificationService, NotificationService>();
+            services.AddScoped<IQuestionServices, QuestionService>();
+            services.AddScoped<IVoteServices, VoteServices>();
+            services.AddScoped<IResultServices, ResultServices>();
+            services.AddScoped<IEmailSender, EmailServices>();
 
-            
+            services.AddBackgroundJobsConfig(configuration);
 
 
-            Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
-            Services.AddFluentValidationAutoValidation();
+            services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
+            services.AddFluentValidationAutoValidation();
 
-            Services.AddExceptionHandler<GlobalExceptionHandler>();
-            Services.AddProblemDetails();
-            Services.Configure<MailSettings>(Configuration.GetSection(nameof(MailSettings)));
-            return Services;
+            services.AddExceptionHandler<GlobalExceptionHandler>();
+            services.AddProblemDetails();
+            services.Configure<MailSettings>(configuration.GetSection(nameof(MailSettings)));
+            return services;
 
         }
-        public static IServiceCollection AddMapsterServicesConfig(this IServiceCollection Services)
+        private static IServiceCollection AddMapsterServicesConfig(this IServiceCollection Services)
         {
             // Add Mapster 
             var Mapping_Conf = TypeAdapterConfig.GlobalSettings;
@@ -73,7 +75,7 @@ namespace Survey_Basket_API
             Services.AddSingleton<IMapper>(new Mapper(Mapping_Conf));
             return Services;
         }
-        public static IServiceCollection AddAuthConfig(this IServiceCollection services,
+        private static IServiceCollection AddAuthConfig(this IServiceCollection services,
             IConfiguration Configuration)
         {
             // services.Configure<JwtOptions>(Configuration.GetSection("Jwt"));
@@ -121,6 +123,20 @@ namespace Survey_Basket_API
             };
 
             
+            return services;
+        }
+        private static IServiceCollection AddBackgroundJobsConfig(this IServiceCollection services,
+            IConfiguration configuration)
+        {
+            // Add Hangfire services.
+            services.AddHangfire(config => config
+                .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+                .UseSimpleAssemblyNameTypeSerializer()
+                .UseRecommendedSerializerSettings()
+                .UseSqlServerStorage(configuration.GetConnectionString("HangfireConnection")));
+
+            // Add the processing server as IHostedService
+            services.AddHangfireServer();
             return services;
         }
 

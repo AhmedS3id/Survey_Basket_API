@@ -1,11 +1,13 @@
-﻿using Survey_Basket_API.Persistence;
+﻿using Hangfire;
+using Survey_Basket_API.Persistence;
 
 namespace Survey_Basket_API.Services
 {
-    public class PollServices(AppDbContext context) : IPollServices
+    public class PollServices(AppDbContext context,INotificationService notificationService) : IPollServices
     {
         private readonly AppDbContext _context = context;
-       
+        private readonly INotificationService _notificationService = notificationService;
+
         public async Task<IEnumerable<PollResponse>> GetAllAsync(CancellationToken cancellationToken ) =>
             await _context.Polls
             .AsNoTracking()
@@ -77,18 +79,22 @@ namespace Survey_Basket_API.Services
 
         public async Task<Result> TogglePublishStatusAsync(int id, CancellationToken cancellationToken)
         {
-            var CurrentPoll = await _context.Polls.FindAsync(id, cancellationToken);
-            if (CurrentPoll != null)
+            var poll = await _context.Polls.FindAsync(id, cancellationToken);
+            if (poll != null)
             {
-                CurrentPoll.IsPublished = !CurrentPoll.IsPublished;
+                poll.IsPublished = !poll.IsPublished;
 
                 await _context.SaveChangesAsync(cancellationToken);
+                if(poll.IsPublished&& poll.StartsAt==DateOnly.FromDateTime(DateTime.UtcNow))
+                BackgroundJob.Enqueue(()=>_notificationService.SendNewPollsNotification(poll.Id));
                 return Result.success();
+                
             }
             else
             {
                 return Result.Failure(PollsErrors.InvalidPolls);
             }
+
         }
     }
 }
