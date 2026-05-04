@@ -1,7 +1,4 @@
-﻿using Survey_Basket_API.Contract.Questions;
-using Survey_Basket_API.Contract.Results;
-using Survey_Basket_API.Entities;
-using Survey_Basket_API.Errors;
+﻿using Survey_Basket_API.Contract.Results;
 using Survey_Basket_API.Persistence;
 
 namespace Survey_Basket_API.Services

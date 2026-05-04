@@ -1,8 +1,4 @@
-﻿using Mapster;
-using Microsoft.AspNetCore.Identity;
-using Survey_Basket_API.Contract.Users;
-using System.Globalization;
-
+﻿using Microsoft.AspNetCore.Identity;
 namespace Survey_Basket_API.Services
 {
     public class UserService(UserManager<ApplicationUser>userManager):IUserService

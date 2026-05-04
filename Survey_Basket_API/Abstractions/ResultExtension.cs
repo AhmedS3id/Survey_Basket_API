@@ -5,7 +5,7 @@
         public static ObjectResult ToProblem(this Result result)
         {
             if (result.IsSuccess)
-                throw new InvalidOperationException("cannot convert from success result to problem");
+                throw new InvalidOperationException("Can not convert from success result to problem");
             var Problem = Results.Problem(statusCode: result.Error.StatusCode);
             var ProblemDetail = Problem.GetType().GetProperty(nameof(ProblemDetails))!.GetValue(Problem) as ProblemDetails;
 

@@ -3,9 +3,13 @@ using Hangfire;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.WebUtilities;
+using Survey_Basket_API.Abstractions.Consts;
 using Survey_Basket_API.Helpers;
+using Survey_Basket_API.Persistence;
+using System.Security;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
 
 namespace Survey_Basket_API.Services
 {
@@ -14,6 +18,7 @@ namespace Survey_Basket_API.Services
         ILogger<AuthServices>logger,
         IJwtProvider jwtProvider,
         IEmailSender emailSender,
+        AppDbContext context,
         IHttpContextAccessor httpContextAccessor) : IAuthServices
     {
         private readonly UserManager<ApplicationUser> _UserManager = UserManager;
@@ -21,6 +26,7 @@ namespace Survey_Basket_API.Services
         private readonly ILogger<AuthServices> _logger = logger;
         private readonly IJwtProvider _jwtProvider = jwtProvider;
         private readonly IEmailSender _emailSender = emailSender;
+        private readonly AppDbContext _context = context;
         private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
         private readonly int _RefreshTokenExpirationDate = 14;
         public async Task<Result<AuthResponse>> GetTokenAsync(string email, String Password, CancellationToken cancellationToken)
@@ -32,7 +38,9 @@ namespace Survey_Basket_API.Services
             var result = await _signInManager.PasswordSignInAsync(user, Password, false,false);
             if (result.Succeeded)
             {
-                var (token, expireIn) = _jwtProvider.GenerateToken(user);
+               var (userRoles, Permission) = await GetRolesAndPermission(user,cancellationToken);
+
+                var (token, expireIn) = _jwtProvider.GenerateToken(user,userRoles,Permission);
                 var RefreshToken = GenerateRefreshToken();
                 var ExpirationDate = DateTime.UtcNow.AddDays(_RefreshTokenExpirationDate);
 
@@ -70,7 +78,11 @@ namespace Survey_Basket_API.Services
 
             var result = await _UserManager.ConfirmEmailAsync(user, code);
             if (result.Succeeded)
+            {
+                await _UserManager.AddToRoleAsync(user, DefaultRoles.Member);
                 return Result.success();
+            }
+                
 
             var error = result.Errors.First();
                 return Result.Failure(new Error(error.Code, error.Description, StatusCodes.Status400BadRequest));
@@ -140,7 +152,9 @@ namespace Survey_Basket_API.Services
 
             UserRefreshToken.RevokedOn = DateTime.UtcNow;
 
-            var (Newtoken, expireIn) = _jwtProvider.GenerateToken(user);
+            var (userRoles, Permission) = await GetRolesAndPermission(user, cancellationToken);
+
+            var (Newtoken, expireIn) = _jwtProvider.GenerateToken(user,userRoles,Permission);
             var newRefreshToken = GenerateRefreshToken();
             var ExpirationDate = DateTime.UtcNow.AddDays(_RefreshTokenExpirationDate);
 
@@ -150,7 +164,7 @@ namespace Survey_Basket_API.Services
                 ExpireOn = ExpirationDate
             });
             await _UserManager.UpdateAsync(user);
-            var result= new AuthResponse(user.Id, user.Email, user.FirstName, user.LastName, Newtoken, expireIn, newRefreshToken, ExpirationDate);
+            var result = new AuthResponse(user.Id, user.Email, user.FirstName, user.LastName, Newtoken, expireIn, newRefreshToken, ExpirationDate);
             return Result.success(result);
 
         }
@@ -229,7 +243,7 @@ namespace Survey_Basket_API.Services
                     {"{{AppName}}" ,"Survey Basket"},
                     {"{{ConfirmationLink}}",$"{Origin}/auth/emailConfirmation?userId={user.Id}&code={code}" }
                 });
-            BackgroundJob.Enqueue(() => _emailSender.SendEmailAsync(user.Email!, "✅Survey Basket : Email Confirmation", EmailBody));
+            BackgroundJob.Enqueue(() => _emailSender.SendEmailAsync(user.Email!, "✅ Survey Basket : Email Confirmation", EmailBody));
             await Task.CompletedTask;
         }
         private async Task SendForgetPasswordEmail(ApplicationUser user,string code)
@@ -244,6 +258,19 @@ namespace Survey_Basket_API.Services
             );
             BackgroundJob.Enqueue(() => _emailSender.SendEmailAsync(user.Email!, "✅ Survey Basket: Change Password ", EmailBody));
             await Task.CompletedTask;
+        }
+        private async Task <(IEnumerable<string> Roles,IEnumerable<string> Permission)> GetRolesAndPermission(ApplicationUser user,CancellationToken cancellationToken)
+        {
+            var userRoles = await _UserManager.GetRolesAsync(user);
+
+            var Permission = await(from r in _context.Roles
+                                   join p in _context.RoleClaims
+                                   on r.Id equals p.RoleId
+                                   where userRoles.Contains(r.Name!)
+                                   select p.ClaimValue)
+                                    .Distinct()
+                                    .ToListAsync(cancellationToken);
+            return (userRoles, Permission);
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.OutputCaching;
+﻿using Survey_Basket_API.Abstractions.Consts;
 using Survey_Basket_API.Contract.Votes;
 
 namespace Survey_Basket_API.Controllers
@@ -6,6 +6,7 @@ namespace Survey_Basket_API.Controllers
     [Route("api/polls/{pollId}/vote")]
     [ApiController]
     //[Authorize]
+    [Authorize (Roles = DefaultRoles.Member)]
     public class VotesController(IQuestionServices QuestionService,IVoteServices voteServices) : ControllerBase
     {
         private readonly IQuestionServices _questionService = QuestionService;

@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Survey_Basket_API.Abstractions.Consts;
 
 namespace Survey_Basket_API.Persistence.EntitiesConfiguration
 {
@@ -14,6 +16,25 @@ namespace Survey_Basket_API.Persistence.EntitiesConfiguration
 
             builder.Property(x => x.FirstName).HasMaxLength(100);
             builder.Property(x => x.LastName).HasMaxLength(100);
+
+           // var passwordHasher = new PasswordHasher<ApplicationUser>();
+
+            builder.HasData(new ApplicationUser 
+            {
+                Id = DefaultUsers.AdminId,
+                FirstName = "Survey Basket",
+                LastName = "Admin",
+                UserName = DefaultUsers.AdminEmail,
+                NormalizedUserName = DefaultUsers.AdminEmail.ToUpper(),
+                Email = DefaultUsers.AdminEmail,
+                NormalizedEmail = DefaultUsers.AdminEmail.ToUpper(),
+                SecurityStamp = DefaultUsers.AdminSecurityStamp,
+                ConcurrencyStamp = DefaultUsers.AdminConcurrencyStamp,
+                EmailConfirmed = true,
+                PasswordHash = DefaultUsers.AdminPasswordHash
+               // PasswordHash = passwordHasher.HashPassword(null!, DefaultUsers.AdminPassword)
+            });
+
 
         }
     }

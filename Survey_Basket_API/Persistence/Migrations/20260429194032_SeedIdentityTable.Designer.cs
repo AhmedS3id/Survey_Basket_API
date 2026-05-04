@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Survey_Basket_API.Persistence;
 
@@ -11,9 +12,11 @@ using Survey_Basket_API.Persistence;
 namespace Survey_Basket_API.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260429194032_SeedIdentityTable")]
+    partial class SeedIdentityTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -301,8 +304,7 @@ namespace Survey_Basket_API.Persistence.Migrations
                             ConcurrencyStamp = "e566a007-a817-454d-bb8f-10d1f09e5715",
                             IsDefault = false,
                             IsDeleted = false,
-                            Name = "Admin",
-                            NormalizedName = "ADMIN"
+                            Name = "Admin"
                         },
                         new
                         {
@@ -310,8 +312,7 @@ namespace Survey_Basket_API.Persistence.Migrations
                             ConcurrencyStamp = "e108b4c9-9c16-4396-a91a-39a3b9e9c11d",
                             IsDefault = true,
                             IsDeleted = false,
-                            Name = "Member",
-                            NormalizedName = "MEMBER"
+                            Name = "Member"
                         });
                 });
 

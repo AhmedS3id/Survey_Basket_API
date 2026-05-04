@@ -1,11 +1,12 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Survey_Basket_API.Abstractions.Consts;
 
 namespace Survey_Basket_API.Controllers
 {
     [Route("api/polls/{pollId}/[controller]")]
     [ApiController]
-    [Authorize]
+    [HasPermission(Permissions.Results)]
     public class ResultController(IResultServices resultServices) : ControllerBase
     {
         private readonly IResultServices _resultServices = resultServices;

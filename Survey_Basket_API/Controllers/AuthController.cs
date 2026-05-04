@@ -1,11 +1,4 @@
 ﻿
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.Extensions.Options;
-using Microsoft.VisualBasic.FileIO;
-using Survey_Basket_API.Authentication;
-using Survey_Basket_API.Errors;
-
 namespace Survey_Basket_API.Controllers
 {
     [Route("[controller]")]
