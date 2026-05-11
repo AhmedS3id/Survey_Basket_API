@@ -13,14 +13,14 @@ namespace Survey_Basket_API.Controllers
         private readonly IRoleServices _roleServices = roleServices;
 
         [HttpGet("")]
-        //[HasPermission(Permissions.GetRoles)]
+        [HasPermission(Permissions.GetRoles)]
         public async Task<IActionResult> GetAll([FromQuery] bool IncludeDisable,CancellationToken cancellationToken)
         {
             var roles = await _roleServices.GetAllAsync(IncludeDisable,cancellationToken);
             return Ok(roles);
         } 
         [HttpGet("{id}")]
-        //[HasPermission(Permissions.GetRoles)]
+        [HasPermission(Permissions.GetRoles)]
         public async Task<IActionResult> GetById([FromRoute]string id,CancellationToken cancellationToken)
         {
             var result = await _roleServices.GetByIdAsync(id,cancellationToken);
@@ -32,7 +32,7 @@ namespace Survey_Basket_API.Controllers
 
         } 
         [HttpPost("")]
-        //[HasPermission(Permissions.AddRoles)]
+        [HasPermission(Permissions.AddRoles)]
         public async Task<IActionResult> Add([FromBody]RolesRequest request,CancellationToken cancellationToken)
         {
             var result = await _roleServices.AddAsync(request,cancellationToken);
@@ -40,15 +40,15 @@ namespace Survey_Basket_API.Controllers
             return result.IsFailure?result.ToProblem():Ok(result.value);
         } 
         [HttpPut("{id}")]
-        //[HasPermission(Permissions.UpdateRoles)]
+        [HasPermission(Permissions.UpdateRoles)]
         public async Task<IActionResult> Update([FromRoute]string id,[FromBody]RolesRequest request,CancellationToken cancellationToken)
         {
-            var result = await _roleServices.UpdateAsync(id,request,cancellationToken);
+            var result = await _roleServices.UpdateAsync(id, request, cancellationToken);
 
             return result.IsFailure?result.ToProblem():NoContent();
         } 
         [HttpPut("{id}/toggle-status")]
-        //[HasPermission(Permissions.UpdateRoles)]
+        [HasPermission(Permissions.UpdateRoles)]
         public async Task<IActionResult> ToggleStatus([FromRoute]string id,CancellationToken cancellationToken)
         {
             var result = await _roleServices.ToggleStatus(id, cancellationToken);
