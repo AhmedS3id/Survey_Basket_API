@@ -9,6 +9,9 @@
       public static readonly Error DuplicatedRole = new("Duplicated Roles",
           "Roles was found With same name",StatusCodes.Status400BadRequest);
 
+      public static readonly Error NotAllowedRoles = new("Not Allowed Roles",
+          "Roles not allowed to add ",StatusCodes.Status400BadRequest);
+
       public static readonly Error NoPermission  = new("Permission Not Allowed",
           " Permission not allowed ", StatusCodes.Status400BadRequest);
         

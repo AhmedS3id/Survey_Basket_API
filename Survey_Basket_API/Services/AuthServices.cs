@@ -35,12 +35,15 @@ namespace Survey_Basket_API.Services
             if (await _UserManager.FindByEmailAsync(email) is not { } user)
                 return (Result.Failure<AuthResponse>(UserCredentials.InvalidCredentials));
 
-            var result = await _signInManager.PasswordSignInAsync(user, Password, false,false);
+            if (user.IsDisabled)
+                return (Result.Failure<AuthResponse>(UserCredentials.DisableUser));
+
+            var result = await _signInManager.PasswordSignInAsync(user, Password, false,true);
             if (result.Succeeded)
             {
-               var (userRoles, Permission) = await GetRolesAndPermission(user,cancellationToken);
+                var (userRoles, Permission) = await GetRolesAndPermission(user, cancellationToken);
 
-                var (token, expireIn) = _jwtProvider.GenerateToken(user,userRoles,Permission);
+                var (token, expireIn) = _jwtProvider.GenerateToken(user, userRoles, Permission);
                 var RefreshToken = GenerateRefreshToken();
                 var ExpirationDate = DateTime.UtcNow.AddDays(_RefreshTokenExpirationDate);
 
@@ -53,7 +56,14 @@ namespace Survey_Basket_API.Services
                 var response = new AuthResponse(user.Id, user.Email, user.FirstName, user.LastName, token, expireIn, RefreshToken, ExpirationDate);
                 return Result.success(response);
             }
-            return Result.Failure<AuthResponse>(result.IsNotAllowed?UserCredentials.EmailNotConfirmed:UserCredentials.InvalidCredentials);
+
+            var error = result.IsNotAllowed ?
+                UserCredentials.EmailNotConfirmed :
+                result.IsLockedOut ?
+                UserCredentials.UserLockedOut :
+                UserCredentials.InvalidCredentials;
+
+            return Result.Failure<AuthResponse>(error);
             
         }
         
@@ -144,6 +154,12 @@ namespace Survey_Basket_API.Services
             var user = await _UserManager.FindByIdAsync(user_Id);
             if (user is null)
                 return Result.Failure<AuthResponse>(UserCredentials.InvalidJwtToken);
+
+            if (user.IsDisabled)
+                return (Result.Failure<AuthResponse>(UserCredentials.DisableUser));
+
+            if (user.LockoutEnabled)
+                return (Result.Failure<AuthResponse>(UserCredentials.UserLockedOut));
 
             var UserRefreshToken = user.RefreshTokens
                 .SingleOrDefault(x => x.Token == RefreshToken && x.Is_Active);
