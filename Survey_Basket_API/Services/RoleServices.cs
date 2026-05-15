@@ -63,7 +63,7 @@ namespace Survey_Basket_API.Services
         {
             var roleIsExist = await _roleManager.Roles.AnyAsync(x => x.Name == request.Name && x.Id == Id, cancellationToken: cancellationToken);
             if (!roleIsExist)
-                return Result.Failure(RolesError.DuplicatedRole);
+                return Result.Failure(RolesError.InvalidRoles);
 
             if (await _roleManager.FindByIdAsync(Id) is not{ }role)
                 return Result.Failure(RolesError.InvalidRoles);
