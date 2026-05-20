@@ -63,7 +63,9 @@ namespace Survey_Basket_API.Services
             if (!IsPollExist)
                 return Result.Failure<PaginatedList<QuestionResponse>>(PollsErrors.InvalidPolls);
             var query =  _context.Questions
-                .Where(x => x.PollId == PollId)
+                .Where(x => x.PollId == PollId&&
+                (string.IsNullOrEmpty(filter.SearchValue)) ||
+                x.Content.Contains(filter.SearchValue))
                 .Include(x => x.Answers)
                 //.Select(q => new QuestionResponse(
                 //    q.Id,
