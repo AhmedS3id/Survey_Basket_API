@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Survey_Basket_API.Abstractions.Consts;
+using Survey_Basket_API.Contract.Common;
 using Survey_Basket_API.Contract.Questions;
 using System.Threading.Tasks;
 
@@ -13,9 +14,9 @@ namespace Survey_Basket_API.Controllers
         private readonly IQuestionServices _questionServices = questionServices;
         [HttpGet("")]
         [HasPermission(Permissions.GetQuestions)]
-        public async Task<IActionResult> GetAll([FromRoute] int pollId,CancellationToken cancellationToken)
+        public async Task<IActionResult> GetAll([FromRoute] int pollId, [FromQuery] RequestFilter filter, CancellationToken cancellationToken)
         {
-            var result = await _questionServices.GetAllAsync(pollId, cancellationToken);
+            var result = await _questionServices.GetAllAsync(pollId,filter,cancellationToken);
             return result.IsSuccess ? Ok(result.value) : result.ToProblem();     
         }
 

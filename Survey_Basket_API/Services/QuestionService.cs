@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Caching.Memory;
 using Survey_Basket_API.Contract.Answers;
+using Survey_Basket_API.Contract.Common;
 using Survey_Basket_API.Contract.Questions;
 using Survey_Basket_API.Persistence;
 
@@ -56,12 +57,12 @@ namespace Survey_Basket_API.Services
             return Result.success<IEnumerable<QuestionResponse>>(Question!);
 
         }
-        public async Task<Result<IEnumerable<QuestionResponse>>> GetAllAsync(int PollId, CancellationToken cancellationToken = default)
+        public async Task<Result<PaginatedList<QuestionResponse>>> GetAllAsync(int PollId, RequestFilter filter,CancellationToken cancellationToken = default)
         {
             var IsPollExist = await _context.Polls.AnyAsync(x => x.Id == PollId, cancellationToken: cancellationToken);
             if (!IsPollExist)
-                return Result.Failure<IEnumerable<QuestionResponse>>(PollsErrors.InvalidPolls);
-            var question = await _context.Questions
+                return Result.Failure<PaginatedList<QuestionResponse>>(PollsErrors.InvalidPolls);
+            var query =  _context.Questions
                 .Where(x => x.PollId == PollId)
                 .Include(x => x.Answers)
                 //.Select(q => new QuestionResponse(
@@ -70,10 +71,9 @@ namespace Survey_Basket_API.Services
                 //    q.Answers.Select(a => new Contract.Answers.AnswerResponse(a.Id, a.Content))
                 //    ))
                 .ProjectToType<QuestionResponse>()
-                .AsNoTracking()
-                .ToListAsync(cancellationToken);
-            return Result.success<IEnumerable<QuestionResponse>>(question);
-      
+                .AsNoTracking();
+            var response = await PaginatedList<QuestionResponse>.CreateAsync(query, filter.PageNumber, filter.PageSize);
+            return Result.success(response);
                 
         }
 
