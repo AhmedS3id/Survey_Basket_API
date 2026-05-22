@@ -1,6 +1,5 @@
-﻿using Microsoft.AspNetCore.OutputCaching;
+﻿using System.Linq.Dynamic.Core;
 using Microsoft.Extensions.Caching.Hybrid;
-using Microsoft.Extensions.Caching.Memory;
 using Survey_Basket_API.Contract.Answers;
 using Survey_Basket_API.Contract.Common;
 using Survey_Basket_API.Contract.Questions;
@@ -62,21 +61,41 @@ namespace Survey_Basket_API.Services
             var IsPollExist = await _context.Polls.AnyAsync(x => x.Id == PollId, cancellationToken: cancellationToken);
             if (!IsPollExist)
                 return Result.Failure<PaginatedList<QuestionResponse>>(PollsErrors.InvalidPolls);
-            var query =  _context.Questions
-                .Where(x => x.PollId == PollId&&
-                (string.IsNullOrEmpty(filter.SearchValue)) ||
-                x.Content.Contains(filter.SearchValue))
-                .Include(x => x.Answers)
-                //.Select(q => new QuestionResponse(
-                //    q.Id,
-                //    q.Content,
-                //    q.Answers.Select(a => new Contract.Answers.AnswerResponse(a.Id, a.Content))
-                //    ))
+            var query = _context.Questions
+                .Where(x => x.PollId == PollId);
+            if (!string.IsNullOrEmpty(filter.SearchValue))
+            {
+               query = query.Where(x=>x.Content.Contains(filter.SearchValue));
+            }
+            var ValidateColumns = new[]{
+                 nameof(Question.Id),
+                 nameof(Question.Content)
+            };
+            if (!string.IsNullOrEmpty(filter.SortColumn)&&
+                ValidateColumns.Contains(filter.SortColumn))
+            {
+               query = query.OrderBy($"{filter.SortColumn} {filter.SortDirection}");
+            }
+            var source = query
                 .ProjectToType<QuestionResponse>()
                 .AsNoTracking();
-            var response = await PaginatedList<QuestionResponse>.CreateAsync(query, filter.PageNumber, filter.PageSize);
+
+            var response = await PaginatedList<QuestionResponse>.CreateAsync(source, filter.PageNumber, filter.PageSize);
             return Result.success(response);
-                
+
+            //var query = _context.Questions
+            //  .Where(x => x.PollId == PollId &&
+            //  (string.IsNullOrEmpty(filter.SearchValue) ||
+            //  x.Content.Contains(filter.SearchValue))
+            //  )
+            //  .Include(x => x.Answers)
+            //  .Select(q => new QuestionResponse(
+            //     q.Id,
+            //     q.Content,
+            //      q.Answers.Select(a => new Contract.Answers.AnswerResponse(a.Id, a.Content))
+            //     ))
+            //  .ProjectToType<QuestionResponse>()
+            //  .AsNoTracking();
         }
 
         public async Task<Result<QuestionResponse>> AddAsync(int PollId, QuestionRequest request, CancellationToken cancellationToken = default)
