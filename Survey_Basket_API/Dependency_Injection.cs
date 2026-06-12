@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.IdentityModel.Tokens;
+using Survey_Basket_API.Health;
 using Survey_Basket_API.Persistence;
 using Survey_Basket_API.Settings;
 using System.Reflection;
@@ -57,6 +58,10 @@ namespace Survey_Basket_API
 
             services.AddBackgroundJobsConfig(configuration);
 
+            services.AddHealthChecks()
+                .AddSqlServer( ConnectionString)
+                .AddHangfire(Options=>Options.MinimumAvailableServers=1)
+                .AddCheck<MailProviderHealthCheck>(name:"mail services");
 
             services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
             services.AddFluentValidationAutoValidation();
