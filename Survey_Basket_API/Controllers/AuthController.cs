@@ -82,7 +82,7 @@ namespace Survey_Basket_API.Controllers
             return Result.IsSuccess ? Ok() : Result.ToProblem();
         }
         [HttpGet("test")]
-        [EnableRateLimiting("fixed")]
+        [EnableRateLimiting("sliding")]
         public IActionResult Test()
         {
             Thread.Sleep(6000);
