@@ -74,16 +74,22 @@ namespace Survey_Basket_API
                 //    option.QueueLimit = 1;
                 //    option.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
                 //});
-                RLOption.AddTokenBucketLimiter("tokens", option =>
+                //RLOption.AddTokenBucketLimiter("tokens", option =>
+                //{
+                //    option.TokenLimit = 10;
+                //    option.QueueLimit = 5;
+                //    option.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+                //    option.ReplenishmentPeriod=TimeSpan.FromSeconds(10);
+                //    option.TokensPerPeriod = 2;
+                //    option.AutoReplenishment = true;
+                //}
+                RLOption.AddFixedWindowLimiter("fixed", option =>
                 {
-                    option.TokenLimit = 10;
-                    option.QueueLimit = 5;
+                    option.PermitLimit = 2;
+                    option.QueueLimit = 1;
+                    option.Window = TimeSpan.FromSeconds(20);
                     option.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
-                    option.ReplenishmentPeriod=TimeSpan.FromSeconds(10);
-                    option.TokensPerPeriod = 2;
-                    option.AutoReplenishment = true;
-                }
-                );
+                });
                
             });
 
