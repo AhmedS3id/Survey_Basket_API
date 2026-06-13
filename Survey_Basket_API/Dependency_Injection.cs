@@ -68,12 +68,22 @@ namespace Survey_Basket_API
             services.AddRateLimiter(RLOption =>
             {
                 RLOption.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
-                RLOption.AddConcurrencyLimiter("concurrency", option =>
+                //RLOption.AddConcurrencyLimiter("concurrency", option =>
+                //{
+                //    option.PermitLimit = 2;
+                //    option.QueueLimit = 1;
+                //    option.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+                //});
+                RLOption.AddTokenBucketLimiter("tokens", option =>
                 {
-                    option.PermitLimit = 2;
-                    option.QueueLimit = 1;
+                    option.TokenLimit = 10;
+                    option.QueueLimit = 5;
                     option.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
-                });
+                    option.ReplenishmentPeriod=TimeSpan.FromSeconds(10);
+                    option.TokensPerPeriod = 2;
+                    option.AutoReplenishment = true;
+                }
+                );
                
             });
 
