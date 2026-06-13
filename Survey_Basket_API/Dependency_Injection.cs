@@ -4,12 +4,14 @@ using MapsterMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.IdentityModel.Tokens;
 using Survey_Basket_API.Health;
 using Survey_Basket_API.Persistence;
 using Survey_Basket_API.Settings;
 using System.Reflection;
 using System.Text;
+using System.Threading.RateLimiting;
 
 namespace Survey_Basket_API
 {
@@ -62,6 +64,18 @@ namespace Survey_Basket_API
                 .AddSqlServer( ConnectionString)
                 .AddHangfire(Options=>Options.MinimumAvailableServers=1)
                 .AddCheck<MailProviderHealthCheck>(name:"mail services");
+
+            services.AddRateLimiter(RLOption =>
+            {
+                RLOption.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+                RLOption.AddConcurrencyLimiter("concurrency", option =>
+                {
+                    option.PermitLimit = 2;
+                    option.QueueLimit = 1;
+                    option.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+                });
+               
+            });
 
             services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
             services.AddFluentValidationAutoValidation();

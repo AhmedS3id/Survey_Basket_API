@@ -1,4 +1,6 @@
 ﻿
+using Microsoft.AspNetCore.RateLimiting;
+
 namespace Survey_Basket_API.Controllers
 {
     [Route("[controller]")]
@@ -78,6 +80,13 @@ namespace Survey_Basket_API.Controllers
             var Result = await _authServices.ResetPasswordAsync( request);
 
             return Result.IsSuccess ? Ok() : Result.ToProblem();
+        }
+        [HttpGet("test")]
+        [EnableRateLimiting("concurrency")]
+        public IActionResult Test()
+        {
+            Thread.Sleep(6000);
+            return Ok();
         }
 
     }
