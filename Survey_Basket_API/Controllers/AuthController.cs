@@ -5,7 +5,7 @@ namespace Survey_Basket_API.Controllers
 {
     [Route("[controller]")]
     [ApiController]
-
+    [EnableRateLimiting("ipLimit")]
     public class AuthController(IAuthServices authServices, ILogger<AuthController> logger
         ) : ControllerBase
     {
@@ -44,6 +44,7 @@ namespace Survey_Basket_API.Controllers
         }
 
         [HttpPost("register")]
+        [DisableRateLimiting]
         public async Task<IActionResult> Register([FromBody] RegisterRequest request, CancellationToken cancellationToken)
         {
             var Result = await _authServices.RegisterAsync( request, cancellationToken);
@@ -80,13 +81,6 @@ namespace Survey_Basket_API.Controllers
             var Result = await _authServices.ResetPasswordAsync( request);
 
             return Result.IsSuccess ? Ok() : Result.ToProblem();
-        }
-        [HttpGet("test")]
-        [EnableRateLimiting("sliding")]
-        public IActionResult Test()
-        {
-            Thread.Sleep(6000);
-            return Ok();
         }
 
     }

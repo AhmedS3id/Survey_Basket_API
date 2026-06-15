@@ -68,6 +68,16 @@ namespace Survey_Basket_API
             services.AddRateLimiter(RLOption =>
             {
                 RLOption.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+                RLOption.AddPolicy("ipLimit", httpContext =>
+                RateLimitPartition.GetFixedWindowLimiter(
+                    partitionKey:httpContext.Connection.RemoteIpAddress?.ToString(),
+                    factory:_=>new FixedWindowRateLimiterOptions
+                    {
+                        PermitLimit=2,
+                        Window=TimeSpan.FromSeconds(20)
+                    }
+                ));
                 //RLOption.AddConcurrencyLimiter("concurrency", option =>
                 //{
                 //    option.PermitLimit = 2;
@@ -90,14 +100,14 @@ namespace Survey_Basket_API
                 //    option.Window = TimeSpan.FromSeconds(20);
                 //    option.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
                 //});
-                RLOption.AddSlidingWindowLimiter("sliding", option =>
-                {
-                    option.PermitLimit = 2;
-                    option.QueueLimit = 1;
-                    option.Window = TimeSpan.FromSeconds(20);
-                    option.SegmentsPerWindow = 2;
-                    option.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
-                });
+                //RLOption.AddSlidingWindowLimiter("sliding", option =>
+                //{
+                //    option.PermitLimit = 2;
+                //    option.QueueLimit = 1;
+                //    option.Window = TimeSpan.FromSeconds(20);
+                //    option.SegmentsPerWindow = 2;
+                //    option.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+                //});
 
             });
 
