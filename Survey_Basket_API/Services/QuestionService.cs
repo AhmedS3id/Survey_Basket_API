@@ -52,7 +52,7 @@ namespace Survey_Basket_API.Services
                     q.Answers.Where(x => x.IsActive).Select(a => new AnswerResponse(a.Id, a.Content))
                     ))
                 .AsNoTracking()
-                .ToListAsync(cancellationToken));
+                .ToListAsync(cancellationToken), cancellationToken: cancellationToken);
             return Result.success<IEnumerable<QuestionResponse>>(Question!);
 
         }

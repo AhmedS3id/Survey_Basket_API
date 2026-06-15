@@ -88,12 +88,12 @@ namespace Survey_Basket_API
                         Window=TimeSpan.FromSeconds(20)
                     }
                 ));
-                //RLOption.AddConcurrencyLimiter("concurrency", option =>
-                //{
-                //    option.PermitLimit = 2;
-                //    option.QueueLimit = 1;
-                //    option.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
-                //});
+                RLOption.AddConcurrencyLimiter("concurrency", option =>
+                {
+                    option.PermitLimit = 2;
+                    option.QueueLimit = 1;
+                    option.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+                });
                 //RLOption.AddTokenBucketLimiter("tokens", option =>
                 //{
                 //    option.TokenLimit = 10;
