@@ -78,6 +78,16 @@ namespace Survey_Basket_API
                         Window=TimeSpan.FromSeconds(20)
                     }
                 ));
+                RLOption.AddPolicy("userLimit", httpContext =>
+                RateLimitPartition.GetFixedWindowLimiter(
+                    partitionKey:httpContext.User.Identity?.Name?.ToString(),
+                    //partitionKey:httpContext.User.GetUserId(),
+                    factory:_=>new FixedWindowRateLimiterOptions
+                    {
+                        PermitLimit=2,
+                        Window=TimeSpan.FromSeconds(20)
+                    }
+                ));
                 //RLOption.AddConcurrencyLimiter("concurrency", option =>
                 //{
                 //    option.PermitLimit = 2;
