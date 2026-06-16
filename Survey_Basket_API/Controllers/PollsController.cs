@@ -1,18 +1,17 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Asp.Versioning;
 using Microsoft.AspNetCore.RateLimiting;
-using Survey_Basket_API.Abstractions;
 using Survey_Basket_API.Abstractions.Consts;
-using Survey_Basket_API.Contract.Poll;
-using System.Threading.Tasks;
 
 namespace Survey_Basket_API.Controllers
 {
-    [Route("api/[controller]")]
+    [ApiVersion("1")]
+    [ApiVersion("2")]
+    [Route("api/v{v:apiVersion}/[controller]")]
     [ApiController]
    
-    public class PollsController(IPollServices pollservices) : ControllerBase
+    public class PollsController(IPollServices pollServices) : ControllerBase
     {
-        private readonly IPollServices _pollServices = pollservices;
+        private readonly IPollServices _pollServices = pollServices;
 
         //public PollsController(IPollServices pollServices)
         //{
@@ -25,12 +24,24 @@ namespace Survey_Basket_API.Controllers
             var polls = await _pollServices.GetAllAsync(cancellationToken);
             return Ok(polls);
         }
+
+        [MapToApiVersion("1")]
         [HttpGet("current")]
         [Authorize(Roles = DefaultRoles.Member)]
         [EnableRateLimiting("ipLimit")]
-        public async Task<IActionResult> GetCurrent(CancellationToken cancellationToken = default)
+        public async Task<IActionResult> GetCurrentV1(CancellationToken cancellationToken = default)
         {
-            var polls = await _pollServices.GetCurrentAsync(cancellationToken);
+            var polls = await _pollServices.GetCurrentAsyncV1(cancellationToken);
+            return Ok(polls);
+        }
+
+        [MapToApiVersion("2")]
+        [HttpGet("current")]
+        [Authorize(Roles = DefaultRoles.Member)]
+        [EnableRateLimiting("ipLimit")]
+        public async Task<IActionResult> GetCurrentV2(CancellationToken cancellationToken = default)
+        {
+            var polls = await _pollServices.GetCurrentAsyncV2(cancellationToken);
             return Ok(polls);
         }
 
@@ -38,7 +49,7 @@ namespace Survey_Basket_API.Controllers
         [HasPermission(Permissions.GetPolls)]
         public async Task<IActionResult> Get([FromRoute] int id, CancellationToken cancellationToken = default)
         {
-            var result = await _pollServices.GetAsync(id);
+            var result = await _pollServices.GetAsync(id, cancellationToken);
 
             //if (result == null)
             //    return NotFound();

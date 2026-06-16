@@ -1,10 +1,12 @@
-﻿using FluentValidation.AspNetCore;
+﻿using Asp.Versioning;
+using FluentValidation.AspNetCore;
 using Hangfire;
 using MapsterMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Survey_Basket_API.Health;
 using Survey_Basket_API.Persistence;
@@ -127,6 +129,19 @@ namespace Survey_Basket_API
             services.AddExceptionHandler<GlobalExceptionHandler>();
             services.AddProblemDetails();
             services.Configure<MailSettings>(configuration.GetSection(nameof(MailSettings)));
+
+            services.AddApiVersioning(option =>
+            {
+                option.DefaultApiVersion = new ApiVersion(1, 0);
+                option.AssumeDefaultVersionWhenUnspecified = true;
+                option.ReportApiVersions = true;
+                option.ApiVersionReader = new UrlSegmentApiVersionReader();
+            }).AddApiExplorer(option =>
+            {
+                option.GroupNameFormat = "'v'V";
+                option.SubstituteApiVersionInUrl = true;
+            });
+
             return services;
 
         }
