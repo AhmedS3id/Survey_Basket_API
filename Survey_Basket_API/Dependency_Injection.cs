@@ -135,7 +135,7 @@ namespace Survey_Basket_API
                 option.DefaultApiVersion = new ApiVersion(1, 0);
                 option.AssumeDefaultVersionWhenUnspecified = true;
                 option.ReportApiVersions = true;
-                option.ApiVersionReader = new QueryStringApiVersionReader("api-version");
+                option.ApiVersionReader = new MediaTypeApiVersionReader("api-version");
                // option.ApiVersionReader = new HeaderApiVersionReader("x-api-version");
             }).AddApiExplorer(option =>
             {
