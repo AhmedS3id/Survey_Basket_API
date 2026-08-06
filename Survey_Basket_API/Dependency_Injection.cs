@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.RateLimiting;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Survey_Basket_API.Health;
 using Survey_Basket_API.Persistence;
@@ -157,7 +156,7 @@ namespace Survey_Basket_API
         private static IServiceCollection AddAuthConfig(this IServiceCollection services,
             IConfiguration Configuration)
         {
-            // services.Configure<JwtOptions>(Configuration.GetSection("Jwt"));
+            //services.Configure<JwtOptions>(Configuration.GetSection("Jwt"));
             services.AddOptions<JwtOptions>()
                  .BindConfiguration("Jwt")
                  .ValidateDataAnnotations()
@@ -197,12 +196,12 @@ namespace Survey_Basket_API
                 options.SignIn.RequireConfirmedEmail = true;
                 options.User.RequireUniqueEmail = true;
             });
-            var test = new
-            {
-                IssuerSigningKey = Configuration["Jwt:Key"]!,
-                ValidIssuer = Configuration["Jwt:Issuer"],
-                ValidAudience = Configuration["Jwt:Audience"]
-            };
+            //var test = new
+            //{
+            //    IssuerSigningKey = Configuration["Jwt:Key"]!,
+            //    ValidIssuer = Configuration["Jwt:Issuer"],
+            //    ValidAudience = Configuration["Jwt:Audience"]
+            //};
 
             
             return services;

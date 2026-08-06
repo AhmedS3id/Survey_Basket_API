@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.SqlServer.Query.Internal;
-using Survey_Basket_API.Abstractions;
-
+﻿
 namespace Survey_Basket_API.Abstractions
 {
     public class Result

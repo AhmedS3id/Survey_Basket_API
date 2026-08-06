@@ -1,8 +1,7 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
+﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Survey_Basket_API.Abstractions.Consts;
 
-namespace Survey_Basket_API.Persistence.EntitiesConfiguration
+namespace Survey_Basket_API.Persistence.EntitiesConfiqurations
 {
     public class UserConfiguration : IEntityTypeConfiguration<ApplicationUser>
     {

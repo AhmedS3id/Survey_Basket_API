@@ -1,16 +1,12 @@
-﻿
-using Hangfire;
+﻿using Hangfire;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.WebUtilities;
 using Survey_Basket_API.Abstractions.Consts;
 using Survey_Basket_API.Helpers;
 using Survey_Basket_API.Persistence;
-using System.Security;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading;
-
 namespace Survey_Basket_API.Services
 {
     public class AuthServices(UserManager<ApplicationUser> UserManager,
@@ -113,7 +109,7 @@ namespace Survey_Basket_API.Services
                 code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
                 _logger.LogInformation("Confirmation code : {code}", code);
 
-                await SendConfirmationEmail(user, code);
+                await SendConfirmationEmail(user,code);
 
                 return Result.success();
             }
@@ -157,9 +153,6 @@ namespace Survey_Basket_API.Services
 
             if (user.IsDisabled)
                 return (Result.Failure<AuthResponse>(UserCredentials.DisableUser));
-
-            if (user.LockoutEnabled)
-                return (Result.Failure<AuthResponse>(UserCredentials.UserLockedOut));
 
             var UserRefreshToken = user.RefreshTokens
                 .SingleOrDefault(x => x.Token == RefreshToken && x.Is_Active);

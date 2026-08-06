@@ -47,8 +47,10 @@ namespace Survey_Basket_API.Authentication
                 {
                     IssuerSigningKey = symmetricSecurityKey,
                     ValidateIssuerSigningKey = true,
-                    ValidateAudience = false,
-                    ValidateIssuer = false,
+                    ValidAudience=_options.Audience,
+                    ValidateAudience = true,
+                    ValidIssuer=_options.Issuer,
+                    ValidateIssuer = true,
                     ClockSkew = TimeSpan.Zero
                 }, out SecurityToken validatedToken);
                 var JwtToken = (JwtSecurityToken)validatedToken;
