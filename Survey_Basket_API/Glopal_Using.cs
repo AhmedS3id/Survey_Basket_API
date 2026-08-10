@@ -2,7 +2,6 @@
 global using Microsoft.AspNetCore.Mvc;
 global using Survey_Basket_API.Entities;
 global using Survey_Basket_API.Services;
-global using System.Diagnostics.Contracts;
 global using Microsoft.EntityFrameworkCore;
 global using FluentValidation;
 global using Survey_Basket_API.Contract.Users;

@@ -38,6 +38,12 @@ namespace Survey_Basket_API.Controllers
             var result = await _userService.UpdateAsync(id,request);
             return result.IsSuccess ? NoContent() : result.ToProblem();
         }
+        [HttpPut("info")]
+        public async Task<IActionResult> UpdateUserProfile( [FromBody] UpdateProfileRequest request)
+        {
+            var result = await _userService.UpdateUserProfileAsync(User.GetUserId()!, request);
+            return result.IsSuccess ? NoContent() : result.ToProblem();
+        }
         [HttpPut("{id}/toggle-status")]
         [HasPermission(Permissions.UpdateUsers)]
         public async Task<IActionResult> ToggleStatus([FromRoute]string id)

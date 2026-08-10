@@ -37,27 +37,35 @@ namespace Survey_Basket_API.Authentication
             return (token: new JwtSecurityTokenHandler().WriteToken(token), _options.ExpireMinutes * 60);
         }
 
-        public string? ValidateToken(string token)
+        public string? ValidateToken(string token) =>
+            ValidateTokenCore(token, validateLifetime: true);
+
+        public string? ValidateExpiredToken(string token) =>
+            ValidateTokenCore(token, validateLifetime: false);
+
+        private string? ValidateTokenCore(string token, bool validateLifetime)
         {
-            var TokenHandler = new JwtSecurityTokenHandler();
+            var tokenHandler = new JwtSecurityTokenHandler();
             var symmetricSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.Key));
             try
             {
-                TokenHandler.ValidateToken(token, new TokenValidationParameters
+                tokenHandler.ValidateToken(token, new TokenValidationParameters
                 {
                     IssuerSigningKey = symmetricSecurityKey,
                     ValidateIssuerSigningKey = true,
-                    ValidAudience=_options.Audience,
-                    ValidateAudience = true,
-                    ValidIssuer=_options.Issuer,
                     ValidateIssuer = true,
+                    ValidIssuer = _options.Issuer,
+                    ValidateAudience = true,
+                    ValidAudience = _options.Audience,
+                    ValidateLifetime = validateLifetime,
                     ClockSkew = TimeSpan.Zero
                 }, out SecurityToken validatedToken);
-                var JwtToken = (JwtSecurityToken)validatedToken;
-                return JwtToken.Claims.First(x=>x.Type== JwtRegisteredClaimNames.Sub).Value;
+
+                var jwtToken = (JwtSecurityToken)validatedToken;
+                return jwtToken.Claims.First(x => x.Type == JwtRegisteredClaimNames.Sub).Value;
             }
             catch
-            { 
+            {
                 return null;
             }
         }

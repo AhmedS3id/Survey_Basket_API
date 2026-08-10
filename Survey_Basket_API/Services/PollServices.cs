@@ -31,7 +31,7 @@ namespace Survey_Basket_API.Services
 
         public async Task<Result<PollResponse>> GetAsync(int id, CancellationToken cancellationToken )
         {
-            var poll=  await _context.Polls.FindAsync(id,cancellationToken);
+            var poll = await _context.Polls.FindAsync([id, cancellationToken], cancellationToken: cancellationToken);
             return poll is not null ? Result.success(poll.Adapt<PollResponse>()) : Result.Failure<PollResponse> (PollsErrors.InvalidPolls);
         }
 
