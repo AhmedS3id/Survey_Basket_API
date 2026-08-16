@@ -32,8 +32,10 @@ namespace Survey_Basket_API.Services
             var user = await _context.Users
                .Include(x => x.RefreshTokens.Where(t => t.RevokedOn == null && t.ExpireOn > DateTime.UtcNow))
                .FirstOrDefaultAsync(x => x.NormalizedEmail == normalizedEmail, cancellationToken);
+            if (user is null)
+                return Result.Failure<AuthResponse>(UserCredentials.InvalidCredentials);
 
-            if (user!.IsDisabled)
+            if (user.IsDisabled)
                 return (Result.Failure<AuthResponse>(UserCredentials.DisableUser));
 
             var result = await _signInManager.PasswordSignInAsync(user, Password, false,true);
@@ -152,8 +154,10 @@ namespace Survey_Basket_API.Services
             var user = await _context.Users
                 .Include(x => x.RefreshTokens.Where(t => t.RevokedOn == null && t.ExpireOn > DateTime.UtcNow))
                 .FirstOrDefaultAsync(x => x.Id == user_Id, cancellationToken);
+            if (user is null)
+                return Result.Failure<AuthResponse>(UserCredentials.InvalidCredentials);
 
-            if (user!.IsDisabled)
+            if (user.IsDisabled)
                 return (Result.Failure<AuthResponse>(UserCredentials.DisableUser));
 
             var UserRefreshToken = user.RefreshTokens
@@ -189,8 +193,10 @@ namespace Survey_Basket_API.Services
             var user = await _context.Users
                 .Include(x => x.RefreshTokens.Where(t => t.RevokedOn == null && t.ExpireOn > DateTime.UtcNow))
                 .FirstOrDefaultAsync(x => x.Id == user_Id, cancellationToken);
+            if (user is null)
+                return Result.Failure<AuthResponse>(UserCredentials.InvalidCredentials);
 
-            var UserRefreshToken = user!.RefreshTokens
+            var UserRefreshToken = user.RefreshTokens
                 .SingleOrDefault(x => x.Token == RefreshToken && x.Is_Active);
             if (UserRefreshToken is null)
                 return Result.Failure<AuthResponse>(UserCredentials.InvalidRefreshToken);
