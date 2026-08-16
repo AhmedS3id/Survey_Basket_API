@@ -28,10 +28,12 @@ namespace Survey_Basket_API.Services
         public async Task<Result<AuthResponse>> GetTokenAsync(string email, String Password, CancellationToken cancellationToken)
         {
 
-            if (await _UserManager.FindByEmailAsync(email) is not { } user)
-                return (Result.Failure<AuthResponse>(UserCredentials.InvalidCredentials));
+            var normalizedEmail = _UserManager.NormalizeEmail(email);
+            var user = await _context.Users
+               .Include(x => x.RefreshTokens.Where(t => t.RevokedOn == null && t.ExpireOn > DateTime.UtcNow))
+               .FirstOrDefaultAsync(x => x.NormalizedEmail == normalizedEmail, cancellationToken);
 
-            if (user.IsDisabled)
+            if (user!.IsDisabled)
                 return (Result.Failure<AuthResponse>(UserCredentials.DisableUser));
 
             var result = await _signInManager.PasswordSignInAsync(user, Password, false,true);
@@ -48,7 +50,7 @@ namespace Survey_Basket_API.Services
                     Token = RefreshToken,
                     ExpireOn = ExpirationDate
                 });
-                await _UserManager.UpdateAsync(user);
+                await _context.SaveChangesAsync(cancellationToken);
                 var response = new AuthResponse(user.Id, user.Email, user.FirstName, user.LastName, token, expireIn, RefreshToken, ExpirationDate);
                 return Result.success(response);
             }
@@ -147,11 +149,11 @@ namespace Survey_Basket_API.Services
             if (user_Id is null)
                 return Result.Failure<AuthResponse>(UserCredentials.InvalidJwtToken);
 
-            var user = await _UserManager.FindByIdAsync(user_Id);
-            if (user is null)
-                return Result.Failure<AuthResponse>(UserCredentials.InvalidJwtToken);
+            var user = await _context.Users
+                .Include(x => x.RefreshTokens.Where(t => t.RevokedOn == null && t.ExpireOn > DateTime.UtcNow))
+                .FirstOrDefaultAsync(x => x.Id == user_Id, cancellationToken);
 
-            if (user.IsDisabled)
+            if (user!.IsDisabled)
                 return (Result.Failure<AuthResponse>(UserCredentials.DisableUser));
 
             var UserRefreshToken = user.RefreshTokens
@@ -163,7 +165,7 @@ namespace Survey_Basket_API.Services
 
             var (userRoles, Permission) = await GetRolesAndPermission(user, cancellationToken);
 
-            var (Newtoken, expireIn) = _jwtProvider.GenerateToken(user,userRoles,Permission);
+            var (newToken, expireIn) = _jwtProvider.GenerateToken(user,userRoles,Permission);
             var newRefreshToken = GenerateRefreshToken();
             var ExpirationDate = DateTime.UtcNow.AddDays(_RefreshTokenExpirationDate);
 
@@ -172,8 +174,8 @@ namespace Survey_Basket_API.Services
                 Token = newRefreshToken,
                 ExpireOn = ExpirationDate
             });
-            await _UserManager.UpdateAsync(user);
-            var result = new AuthResponse(user.Id, user.Email, user.FirstName, user.LastName, Newtoken, expireIn, newRefreshToken, ExpirationDate);
+            await _context.SaveChangesAsync(cancellationToken);
+            var result = new AuthResponse(user.Id, user.Email, user.FirstName, user.LastName, newToken, expireIn, newRefreshToken, ExpirationDate);
             return Result.success(result);
 
         }
@@ -184,11 +186,11 @@ namespace Survey_Basket_API.Services
             if (user_Id is null)
                 return Result.Failure<AuthResponse>(UserCredentials.InvalidJwtToken);
 
-            var user = await _UserManager.FindByIdAsync(user_Id);
-            if (user is null)
-                return Result.Failure<AuthResponse> (UserCredentials.InvalidCredentials);
+            var user = await _context.Users
+                .Include(x => x.RefreshTokens.Where(t => t.RevokedOn == null && t.ExpireOn > DateTime.UtcNow))
+                .FirstOrDefaultAsync(x => x.Id == user_Id, cancellationToken);
 
-            var UserRefreshToken = user.RefreshTokens
+            var UserRefreshToken = user!.RefreshTokens
                 .SingleOrDefault(x => x.Token == RefreshToken && x.Is_Active);
             if (UserRefreshToken is null)
                 return Result.Failure<AuthResponse>(UserCredentials.InvalidRefreshToken);
