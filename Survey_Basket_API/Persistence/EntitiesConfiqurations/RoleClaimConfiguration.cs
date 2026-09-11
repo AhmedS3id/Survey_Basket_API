@@ -14,14 +14,14 @@ namespace Survey_Basket_API.Persistence.EntitiesConfiqurations
             {
                 adminClaims.Add(new IdentityRoleClaim<string>
                 {
-                    Id=i+1,
-                    ClaimType=Permissions.Type,
+                    Id = i + 1,
+                    ClaimType = Permissions.Type,
                     ClaimValue = Permission[i],
-                    RoleId=DefaultRoles.AdminRoleId
+                    RoleId = DefaultRoles.AdminRoleId
                 });
             }
             builder.HasData(adminClaims);
-            
+
 
         }
     }

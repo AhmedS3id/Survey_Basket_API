@@ -1,8 +1,6 @@
-﻿using Survey_Basket_API.Abstractions;
-
-namespace Survey_Basket_API.Errors
+﻿namespace Survey_Basket_API.Errors
 {
-    public static class UserCredentials
+    public record UserCredentials
     {
         public static readonly Error InvalidCredentials =
                 new("User.InvalidCredentials", "Invalid email/password", StatusCodes.Status401Unauthorized);

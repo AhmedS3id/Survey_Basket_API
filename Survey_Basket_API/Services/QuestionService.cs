@@ -1,9 +1,9 @@
-﻿using System.Linq.Dynamic.Core;
-using Microsoft.Extensions.Caching.Hybrid;
+﻿using Microsoft.Extensions.Caching.Hybrid;
 using Survey_Basket_API.Contract.Answers;
 using Survey_Basket_API.Contract.Common;
 using Survey_Basket_API.Contract.Questions;
 using Survey_Basket_API.Persistence;
+using System.Linq.Dynamic.Core;
 
 namespace Survey_Basket_API.Services
 {
@@ -29,12 +29,12 @@ namespace Survey_Basket_API.Services
         }
         public async Task<Result<IEnumerable<QuestionResponse>>> GetCurrentAsync(int PollId, string UserId, CancellationToken cancellationToken = default)
         {
-            
-            var hasVot = await _context.Votes.AnyAsync(x => x.PollId == PollId && x.UserId == UserId,cancellationToken);
+
+            var hasVot = await _context.Votes.AnyAsync(x => x.PollId == PollId && x.UserId == UserId, cancellationToken);
             if (hasVot)
                 return Result.Failure<IEnumerable<QuestionResponse>>(VotesErrors.DuplicatedVote);
 
-            var pollExist = await _context.Polls.AnyAsync(x => x.Id == PollId && 
+            var pollExist = await _context.Polls.AnyAsync(x => x.Id == PollId &&
             x.IsPublished && x.StartsAt <= DateOnly.FromDateTime(DateTime.UtcNow)
             && x.EndsAt >= DateOnly.FromDateTime(DateTime.UtcNow), cancellationToken);
             if (!pollExist)
@@ -56,7 +56,7 @@ namespace Survey_Basket_API.Services
             return Result.success<IEnumerable<QuestionResponse>>(Question!);
 
         }
-        public async Task<Result<PaginatedList<QuestionResponse>>> GetAllAsync(int PollId, RequestFilter filter,CancellationToken cancellationToken = default)
+        public async Task<Result<PaginatedList<QuestionResponse>>> GetAllAsync(int PollId, RequestFilter filter, CancellationToken cancellationToken = default)
         {
             var IsPollExist = await _context.Polls.AnyAsync(x => x.Id == PollId, cancellationToken: cancellationToken);
             if (!IsPollExist)
@@ -65,16 +65,16 @@ namespace Survey_Basket_API.Services
                 .Where(x => x.PollId == PollId);
             if (!string.IsNullOrEmpty(filter.SearchValue))
             {
-               query = query.Where(x=>x.Content.Contains(filter.SearchValue));
+                query = query.Where(x => x.Content.Contains(filter.SearchValue));
             }
             var ValidateColumns = new[]{
                  nameof(Question.Id),
                  nameof(Question.Content)
             };
-            if (!string.IsNullOrEmpty(filter.SortColumn)&&
+            if (!string.IsNullOrEmpty(filter.SortColumn) &&
                 ValidateColumns.Contains(filter.SortColumn))
             {
-               query = query.OrderBy($"{filter.SortColumn} {filter.SortDirection}");
+                query = query.OrderBy($"{filter.SortColumn} {filter.SortDirection}");
             }
             var source = query
                 .ProjectToType<QuestionResponse>()
@@ -111,9 +111,9 @@ namespace Survey_Basket_API.Services
             var question = request.Adapt<Question>();
             question.PollId = PollId;
 
-           // request.Answers.ForEach(answer => question.Answers.Add(new Answer { Content = answer }));
+            // request.Answers.ForEach(answer => question.Answers.Add(new Answer { Content = answer }));
 
-           await _context.Questions.AddAsync(question, cancellationToken);
+            await _context.Questions.AddAsync(question, cancellationToken);
             await _context.SaveChangesAsync(cancellationToken);
 
             await _hybridCache.RemoveAsync($"{_cachePrefix}-{PollId}", cancellationToken);
@@ -134,7 +134,7 @@ namespace Survey_Basket_API.Services
                 return Result.Failure(QuestionErrors.DuplicatedQuestionContent);
 
             var question = await _context.Questions
-                .Include(x=>x.Answers)
+                .Include(x => x.Answers)
                 .FirstOrDefaultAsync(x => x.PollId == PollId && x.Id == id, cancellationToken);
 
             if (question is null)
@@ -143,7 +143,7 @@ namespace Survey_Basket_API.Services
             question.Content = request.Content;
 
             //current Answer
-            var CurrentAnswer = question.Answers.Select(x=>x.Content).ToList();
+            var CurrentAnswer = question.Answers.Select(x => x.Content).ToList();
             //new answer 
             var NewAnswer = request.Answers.Except(CurrentAnswer).ToList();
 
@@ -151,7 +151,7 @@ namespace Survey_Basket_API.Services
 
             foreach (var answer in question.Answers)
             {
-                answer.IsActive= request.Answers.Contains(answer.Content);
+                answer.IsActive = request.Answers.Contains(answer.Content);
             }
 
             await _context.SaveChangesAsync(cancellationToken);
@@ -177,6 +177,6 @@ namespace Survey_Basket_API.Services
             return Result.success();
         }
 
-        
+
     }
 }

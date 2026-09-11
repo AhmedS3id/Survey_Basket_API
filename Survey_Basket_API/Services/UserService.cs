@@ -1,11 +1,9 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Survey_Basket_API.Abstractions.Consts;
-using Survey_Basket_API.Mapping;
 using Survey_Basket_API.Persistence;
 namespace Survey_Basket_API.Services
 {
-    public class UserService(UserManager<ApplicationUser>userManager,AppDbContext context ):IUserService
+    public class UserService(UserManager<ApplicationUser> userManager, AppDbContext context) : IUserService
     {
         private readonly UserManager<ApplicationUser> _userManager = userManager;
         private readonly AppDbContext _context = context;
@@ -59,9 +57,9 @@ namespace Survey_Basket_API.Services
         //            u.SelectMany(x =>x.Roles)
         //      )).ToListAsync();
 
-        public async Task <Result<UserResponse>> AddAsync (CreateUserRequest request)
+        public async Task<Result<UserResponse>> AddAsync(CreateUserRequest request)
         {
-            var isEmailExist = await _userManager.Users.AnyAsync(x=>x.Email==request.Email);
+            var isEmailExist = await _userManager.Users.AnyAsync(x => x.Email == request.Email);
             if (isEmailExist)
                 return Result.Failure<UserResponse>(UserCredentials.InvalidEmail);
 
@@ -73,10 +71,10 @@ namespace Survey_Basket_API.Services
             var user = request.Adapt<ApplicationUser>();
             user.UserName = request.Email;
             user.EmailConfirmed = true;
-            var result = await _userManager.CreateAsync(user,request.Password);
+            var result = await _userManager.CreateAsync(user, request.Password);
             if (result.Succeeded)
             {
-                await _userManager.AddToRolesAsync(user,request.Roles);
+                await _userManager.AddToRolesAsync(user, request.Roles);
                 var response = new UserResponse(
                     user.Id,
                     user.FirstName,
@@ -90,9 +88,9 @@ namespace Survey_Basket_API.Services
             var error = result.Errors.FirstOrDefault();
             return Result.Failure<UserResponse>(new Error(error!.Code, error.Description, StatusCodes.Status400BadRequest));
         }
-        public async Task <Result> UpdateAsync (string id,UpdateUserRequest request)
+        public async Task<Result> UpdateAsync(string id, UpdateUserRequest request)
         {
-            var isEmailExist = await _userManager.Users.AnyAsync(x=>x.Email==request.Email&&x.Id!=id);
+            var isEmailExist = await _userManager.Users.AnyAsync(x => x.Email == request.Email && x.Id != id);
             if (isEmailExist)
                 return Result.Failure<UserResponse>(UserCredentials.InvalidEmail);
 
@@ -111,9 +109,9 @@ namespace Survey_Basket_API.Services
             if (result.Succeeded)
             {
                 await _context.UserRoles
-                    .Where(x=>x.UserId==id)
+                    .Where(x => x.UserId == id)
                     .ExecuteDeleteAsync();
-                await _userManager.AddToRolesAsync(user,request.Roles);
+                await _userManager.AddToRolesAsync(user, request.Roles);
                 return Result.success();
             }
             var error = result.Errors.FirstOrDefault();
@@ -128,12 +126,12 @@ namespace Survey_Basket_API.Services
 
             var result = await _userManager.UpdateAsync(user);
 
-            if (result.Succeeded) 
+            if (result.Succeeded)
                 return Result.success();
 
             var error = result.Errors.First();
 
-            return Result.Failure(new Error(error.Code,error.Description, StatusCodes.Status400BadRequest));
+            return Result.Failure(new Error(error.Code, error.Description, StatusCodes.Status400BadRequest));
         }
         public async Task<Result> UnlockAcc(string id)
         {
@@ -142,12 +140,12 @@ namespace Survey_Basket_API.Services
 
             var result = await _userManager.SetLockoutEndDateAsync(user, null);
 
-            if (result.Succeeded) 
+            if (result.Succeeded)
                 return Result.success();
 
             var error = result.Errors.First();
 
-            return Result.Failure(new Error(error.Code,error.Description, StatusCodes.Status400BadRequest));
+            return Result.Failure(new Error(error.Code, error.Description, StatusCodes.Status400BadRequest));
         }
         public async Task<Result<UserResponse>> GetAsync(string id)
         {
@@ -163,9 +161,9 @@ namespace Survey_Basket_API.Services
                  user.IsDisabled,
                  userRoles
             );
-            return Result<UserResponse>.success( Response );
+            return Result<UserResponse>.success(Response);
         }
-        public async Task <Result<UsersProfileResponse>> GetProfileAsync(String Id)
+        public async Task<Result<UsersProfileResponse>> GetProfileAsync(String Id)
         {
             //var user = await _userManager.FindByIdAsync(Id);
 
@@ -174,28 +172,28 @@ namespace Survey_Basket_API.Services
                 .ProjectToType<UsersProfileResponse>()
                 .FirstAsync();
 
-            return Result.success( user);
+            return Result.success(user);
         }
-        public async Task <Result> UpdateUserProfileAsync(string Id,UpdateProfileRequest request)
+        public async Task<Result> UpdateUserProfileAsync(string Id, UpdateProfileRequest request)
         {
             var user = await _userManager.Users
-                .Where(x=>x.Id==Id)
+                .Where(x => x.Id == Id)
                 .ExecuteUpdateAsync(s => s
-                     .SetProperty(u=>u.FirstName,request.FirstName)
+                     .SetProperty(u => u.FirstName, request.FirstName)
                       .SetProperty(u => u.LastName, request.LastName));
             //user = request.Adapt(user);
             //await _userManager.UpdateAsync(user!);
 
             return Result.success();
         }
-        public async Task <Result> ChangePasswordAsync(string Id,ChangePasswordRequest request)
+        public async Task<Result> ChangePasswordAsync(string Id, ChangePasswordRequest request)
         {
             var user = await _userManager.FindByIdAsync(Id);
-            var result = await _userManager.ChangePasswordAsync(user!, request.CurrentPassword,request.NewPassword);
-            if (result.Succeeded) 
+            var result = await _userManager.ChangePasswordAsync(user!, request.CurrentPassword, request.NewPassword);
+            if (result.Succeeded)
                 return Result.success();
 
-            var error=result.Errors.First();
+            var error = result.Errors.First();
             return Result.Failure(new Error(error.Code, error.Description, StatusCodes.Status400BadRequest));
         }
     }

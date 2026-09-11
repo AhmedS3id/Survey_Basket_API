@@ -8,27 +8,27 @@ namespace Survey_Basket_API.Controllers
     {
         private readonly IUserService _userService = userService;
 
-        [HttpGet ("")]
-        public async Task <IActionResult> Info ()
+        [HttpGet("")]
+        public async Task<IActionResult> Info()
         {
             var result = await _userService.GetProfileAsync(User.GetUserId()!);
 
-            return Ok (result.value);
+            return Ok(result.value);
         }
-        [HttpPut ("info")]
-        public async Task <IActionResult> UpdateUser([FromBody]  UpdateProfileRequest request)
+        [HttpPut("info")]
+        public async Task<IActionResult> UpdateUser([FromBody] UpdateProfileRequest request)
         {
-             await _userService.UpdateUserProfileAsync(User.GetUserId()!,request);
+            await _userService.UpdateUserProfileAsync(User.GetUserId()!, request);
 
-            return NoContent ();
+            return NoContent();
         }
 
-        [HttpPut ("change-password")]
-        public async Task <IActionResult> ChangePassword([FromBody]  ChangePasswordRequest request)
+        [HttpPut("change-password")]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
         {
-            var result = await _userService.ChangePasswordAsync(User.GetUserId()!,request);
+            var result = await _userService.ChangePasswordAsync(User.GetUserId()!, request);
 
-            return result.IsSuccess?NoContent():result.ToProblem();
+            return result.IsSuccess ? NoContent() : result.ToProblem();
 
         }
     }

@@ -10,7 +10,7 @@ namespace Survey_Basket_API.Authentication
 {
     public class JwtProvider(IOptions<JwtOptions> options) : IJwtProvider
     {
-        private readonly JwtOptions _options  = options.Value;
+        private readonly JwtOptions _options = options.Value;
 
         public (string token, int expireIn) GenerateToken(ApplicationUser user, IEnumerable<string> roles, IEnumerable<string> permissions)
         {
@@ -19,16 +19,16 @@ namespace Survey_Basket_API.Authentication
                 new(JwtRegisteredClaimNames.Email,user.Email!),
                 new(JwtRegisteredClaimNames.GivenName,user.FirstName),
                 new(JwtRegisteredClaimNames.FamilyName,user.LastName),
-                new(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString()),
+                new(JwtRegisteredClaimNames.Jti,Guid.CreateVersion7().ToString()),
                 new(nameof(roles),JsonSerializer.Serialize(roles),JsonClaimValueTypes.JsonArray),
                 new(nameof(permissions),JsonSerializer.Serialize(permissions),JsonClaimValueTypes.JsonArray)
                 ];
             var symmetricSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.Key));
-            var SigningCredentials = new SigningCredentials(symmetricSecurityKey,SecurityAlgorithms.HmacSha256 );
-           //var expiresIn = 30;
- 
+            var SigningCredentials = new SigningCredentials(symmetricSecurityKey, SecurityAlgorithms.HmacSha256);
+            //var expiresIn = 30;
+
             var token = new JwtSecurityToken(
-                issuer:_options.Issuer,
+                issuer: _options.Issuer,
                 audience: _options.Audience,
                 claims: claims,
                 expires: DateTime.UtcNow.AddMinutes(_options.ExpireMinutes),

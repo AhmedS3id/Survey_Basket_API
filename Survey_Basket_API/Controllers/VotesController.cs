@@ -6,16 +6,16 @@ namespace Survey_Basket_API.Controllers
 {
     [Route("api/polls/{pollId}/vote")]
     [ApiController]
-    [Authorize (Roles = DefaultRoles.Member)]
+    [Authorize(Roles = DefaultRoles.Member)]
     [EnableRateLimiting("concurrency")]
-    public class VotesController(IQuestionServices QuestionService,IVoteServices voteServices) : ControllerBase
+    public class VotesController(IQuestionServices QuestionService, IVoteServices voteServices) : ControllerBase
     {
         private readonly IQuestionServices _questionService = QuestionService;
         private readonly IVoteServices _voteServices = voteServices;
 
         [HttpGet("")]
-        
-        public async Task<IActionResult> Start([FromRoute]int pollId,CancellationToken cancellationToken)
+
+        public async Task<IActionResult> Start([FromRoute] int pollId, CancellationToken cancellationToken)
         {
             var user = "68050360-e7d4-40b6-8dcd-91b2f784dd40";//User.GetUserId();
             var result = await _questionService.GetCurrentAsync(pollId, user!, cancellationToken);
@@ -23,13 +23,13 @@ namespace Survey_Basket_API.Controllers
 
         }
         [HttpPost("")]
-        public async Task<IActionResult> Vote([FromRoute] int pollId, VoteRequest request,CancellationToken cancellationToken)
+        public async Task<IActionResult> Vote([FromRoute] int pollId, VoteRequest request, CancellationToken cancellationToken)
         {
-            var result =await _voteServices.AddAsync(pollId,User.GetUserId()!,request,cancellationToken);
-          
-            return result.IsSuccess? Created():result.ToProblem();
+            var result = await _voteServices.AddAsync(pollId, User.GetUserId()!, request, cancellationToken);
 
-            
+            return result.IsSuccess ? Created() : result.ToProblem();
+
+
         }
     }
 }

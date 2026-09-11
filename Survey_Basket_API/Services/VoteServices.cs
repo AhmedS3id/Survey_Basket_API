@@ -7,7 +7,7 @@ namespace Survey_Basket_API.Services
     {
         private readonly AppDbContext _context = context;
 
-        public async Task<Result> AddAsync(int pollId, string UserId,VoteRequest request, CancellationToken cancellationToken)
+        public async Task<Result> AddAsync(int pollId, string UserId, VoteRequest request, CancellationToken cancellationToken)
         {
             var hasVot = await _context.Votes.AnyAsync(x => x.PollId == pollId && x.UserId == UserId, cancellationToken);
             if (hasVot)
@@ -22,9 +22,9 @@ namespace Survey_Basket_API.Services
 
             var availableQuestion = await _context.Questions
                 .Where(x => x.PollId == pollId && x.IsActive)
-                .Select(x=>x.Id)
+                .Select(x => x.Id)
                 .ToListAsync(cancellationToken);
-            if (!request.Answer.Select(x=>x.QuestionId).SequenceEqual(availableQuestion))
+            if (!request.Answer.Select(x => x.QuestionId).SequenceEqual(availableQuestion))
                 return Result.Failure(VotesErrors.InvalidQuestion);
             var vote = new Vote
             {

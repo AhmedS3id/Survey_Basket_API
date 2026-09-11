@@ -1,6 +1,4 @@
-﻿using Survey_Basket_API.Contract.Users;
-
-namespace Survey_Basket_API.Services
+﻿namespace Survey_Basket_API.Services
 {
     public interface IUserService
     {

@@ -10,5 +10,5 @@
         string RefreshToken,
         DateTime RefreshTokenExpiration
         );
-    
+
 }

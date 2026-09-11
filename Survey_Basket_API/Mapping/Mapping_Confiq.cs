@@ -10,7 +10,7 @@ namespace Survey_Basket_API.Mapping
             config.NewConfig<QuestionRequest, Question>()
                 .Map(des => des.Answers, src => src.Answers.Select(Answer => new Answer { Content = Answer }));
 
-            config.NewConfig<RegisterRequest,ApplicationUser>()
+            config.NewConfig<RegisterRequest, ApplicationUser>()
                 .Map(des => des.UserName, src => src.Email);
 
             //config.NewConfig<(ApplicationUser user, IList<string> roles), UserResponse>()

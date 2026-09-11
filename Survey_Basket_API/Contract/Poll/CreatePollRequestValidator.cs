@@ -1,15 +1,15 @@
 ﻿namespace Survey_Basket_API.Contract.Poll
-    
+
 {
-    public class CreatePollRequestValidator:AbstractValidator<PollRequest>
+    public class CreatePollRequestValidator : AbstractValidator<PollRequest>
     {
         public CreatePollRequestValidator()
         {
-            RuleFor(x =>x.Title).NotEmpty()
-                .Length(3,100); 
+            RuleFor(x => x.Title).NotEmpty()
+                .Length(3, 100);
 
-            RuleFor(x =>x.Summary).NotEmpty()
-                .Length(3,100);
+            RuleFor(x => x.Summary).NotEmpty()
+                .Length(3, 100);
 
             RuleFor(x => x.StartsAt).NotEmpty()
                 .GreaterThanOrEqualTo(DateOnly.FromDateTime(DateTime.Today));
@@ -24,7 +24,7 @@
         }
         private bool HasValidDate(PollRequest pollRequest)
         {
-            return pollRequest.EndsAt>=pollRequest.StartsAt;
+            return pollRequest.EndsAt >= pollRequest.StartsAt;
         }
     }
 }

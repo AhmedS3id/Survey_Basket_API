@@ -2,6 +2,6 @@
 {
     public record ResendConfirmationEmailRequest(
        string Email
-         
+
         );
 }

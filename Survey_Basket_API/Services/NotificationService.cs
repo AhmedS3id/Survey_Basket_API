@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Survey_Basket_API.Abstractions.Consts;
 using Survey_Basket_API.Helpers;
 using Survey_Basket_API.Persistence;
 
@@ -17,8 +18,8 @@ namespace Survey_Basket_API.Services
 
         public async Task SendNewPollsNotification(int? pollId = null)
         {
-         IEnumerable<Poll> polls = [];
-            if(pollId.HasValue)
+            IEnumerable<Poll> polls = [];
+            if (pollId.HasValue)
             {
                 var poll = await _context.Polls.FirstOrDefaultAsync(x => x.Id == pollId && x.IsPublished);
                 polls = [poll!];
@@ -28,9 +29,9 @@ namespace Survey_Basket_API.Services
                 polls = await _context.Polls
                      .Where(x => x.IsPublished && x.StartsAt == DateOnly.FromDateTime(DateTime.UtcNow))
                      .AsNoTracking()
-                     .ToListAsync();   
+                     .ToListAsync();
             }
-            var users = await _userManager.Users.ToListAsync();
+            var users = await _userManager.GetUsersInRoleAsync(DefaultRoles.Member);
 
             var Origin = _httpContextAccessor.HttpContext?.Request.Headers.Origin;
 

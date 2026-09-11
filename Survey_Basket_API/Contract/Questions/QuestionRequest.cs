@@ -3,6 +3,6 @@
     public record QuestionRequest
     (
         String Content,
-        List <String>Answers
+        List<String> Answers
     );
 }

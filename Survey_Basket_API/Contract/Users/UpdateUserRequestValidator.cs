@@ -7,7 +7,7 @@
             RuleFor(x => x.Email)
                 .EmailAddress()
                 .NotEmpty();
-           
+
             RuleFor(x => x.FirstName)
                 .NotEmpty()
                 .Length(3, 200);

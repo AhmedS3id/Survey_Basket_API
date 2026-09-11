@@ -39,8 +39,8 @@ namespace Survey_Basket_API
             services.AddMapsterServicesConfig()
                 .AddAuthConfig(configuration);
 
-         var ConnectionString = configuration.GetConnectionString("DefaultConnection") ??
-         throw new InvalidOperationException("Connection String 'DefaultConnection' Is Not Found .");
+            var ConnectionString = configuration.GetConnectionString("DefaultConnection") ??
+            throw new InvalidOperationException("Connection String 'DefaultConnection' Is Not Found .");
 
             services.AddDbContext<AppDbContext>
               (options => options.UseSqlServer(ConnectionString));
@@ -62,9 +62,9 @@ namespace Survey_Basket_API
             services.AddBackgroundJobsConfig(configuration);
 
             services.AddHealthChecks()
-                .AddSqlServer( ConnectionString)
-                .AddHangfire(Options=>Options.MinimumAvailableServers=1)
-                .AddCheck<MailProviderHealthCheck>(name:"mail services");
+                .AddSqlServer(ConnectionString)
+                .AddHangfire(Options => Options.MinimumAvailableServers = 1)
+                .AddCheck<MailProviderHealthCheck>(name: "mail services");
 
             services.AddRateLimiter(RLOption =>
             {
@@ -72,21 +72,21 @@ namespace Survey_Basket_API
 
                 RLOption.AddPolicy("ipLimit", httpContext =>
                 RateLimitPartition.GetFixedWindowLimiter(
-                    partitionKey:httpContext.Connection.RemoteIpAddress?.ToString(),
-                    factory:_=>new FixedWindowRateLimiterOptions
+                    partitionKey: httpContext.Connection.RemoteIpAddress?.ToString(),
+                    factory: _ => new FixedWindowRateLimiterOptions
                     {
-                        PermitLimit=2,
-                        Window=TimeSpan.FromSeconds(20)
+                        PermitLimit = 2,
+                        Window = TimeSpan.FromSeconds(20)
                     }
                 ));
                 RLOption.AddPolicy("userLimit", httpContext =>
                 RateLimitPartition.GetFixedWindowLimiter(
-                    partitionKey:httpContext.User.Identity?.Name?.ToString(),
-                    //partitionKey:httpContext.User.GetUserId(),
-                    factory:_=>new FixedWindowRateLimiterOptions
+                    // partitionKey:httpContext.User.Identity?.Name?.ToString(),
+                    partitionKey: httpContext.User.GetUserId(),
+                    factory: _ => new FixedWindowRateLimiterOptions
                     {
-                        PermitLimit=2,
-                        Window=TimeSpan.FromSeconds(20)
+                        PermitLimit = 2,
+                        Window = TimeSpan.FromSeconds(20)
                     }
                 ));
                 RLOption.AddConcurrencyLimiter("concurrency", option =>
@@ -127,7 +127,11 @@ namespace Survey_Basket_API
 
             services.AddExceptionHandler<GlobalExceptionHandler>();
             services.AddProblemDetails();
-            services.Configure<MailSettings>(configuration.GetSection(nameof(MailSettings)));
+            //services.Configure<MailSettings>(configuration.GetSection(nameof(MailSettings)));
+            services.AddOptions<MailSettings>()
+                .BindConfiguration(nameof(MailSettings))
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
 
             services.AddApiVersioning(option =>
             {
@@ -163,12 +167,12 @@ namespace Survey_Basket_API
                  .ValidateOnStart();
             var JwtSettings = Configuration.GetSection("Jwt").Get<JwtOptions>();
 
-            services.AddSingleton<IJwtProvider, JwtProvider>();   
+            services.AddSingleton<IJwtProvider, JwtProvider>();
 
             services.AddTransient<IAuthorizationHandler, PermissionAuthorizationHandler>();
             services.AddTransient<IAuthorizationPolicyProvider, PermissionAuthorizationPolicyProvider>();
 
-            services.AddIdentity<ApplicationUser,ApplicationRole>()
+            services.AddIdentity<ApplicationUser, ApplicationRole>()
                   .AddEntityFrameworkStores<AppDbContext>()
                   .AddDefaultTokenProviders();
 
@@ -203,7 +207,7 @@ namespace Survey_Basket_API
             //    ValidAudience = Configuration["Jwt:Audience"]
             //};
 
-            
+
             return services;
         }
         private static IServiceCollection AddBackgroundJobsConfig(this IServiceCollection services,

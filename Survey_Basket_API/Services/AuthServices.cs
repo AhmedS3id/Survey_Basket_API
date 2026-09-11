@@ -10,8 +10,8 @@ using System.Text;
 namespace Survey_Basket_API.Services
 {
     public class AuthServices(UserManager<ApplicationUser> UserManager,
-        SignInManager <ApplicationUser>signInManager,
-        ILogger<AuthServices>logger,
+        SignInManager<ApplicationUser> signInManager,
+        ILogger<AuthServices> logger,
         IJwtProvider jwtProvider,
         IEmailSender emailSender,
         AppDbContext context,
@@ -38,7 +38,7 @@ namespace Survey_Basket_API.Services
             if (user.IsDisabled)
                 return (Result.Failure<AuthResponse>(UserCredentials.DisableUser));
 
-            var result = await _signInManager.PasswordSignInAsync(user, Password, false,true);
+            var result = await _signInManager.PasswordSignInAsync(user, Password, false, true);
             if (result.Succeeded)
             {
                 var (userRoles, Permission) = await GetRolesAndPermission(user, cancellationToken);
@@ -64,24 +64,25 @@ namespace Survey_Basket_API.Services
                 UserCredentials.InvalidCredentials;
 
             return Result.Failure<AuthResponse>(error);
-            
+
         }
-        
-        public async Task <Result>ConfirmationEmail(ConfirmEmailRequest request)
+
+        public async Task<Result> ConfirmationEmail(ConfirmEmailRequest request)
         {
             if (await _UserManager.FindByIdAsync(request.UserId) is not { } user)
-            return Result.Failure(UserCredentials.InvalidCode);
+                return Result.Failure(UserCredentials.InvalidCode);
 
             if (user.EmailConfirmed)
                 return Result.Failure(UserCredentials.DuplicatedConfirmed);
-            
-            var code =request.Code;
+
+            var code = request.Code;
 
             try
             {
                 code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(code));
 
-            }catch (FormatException )
+            }
+            catch (FormatException)
             {
                 return Result.Failure(UserCredentials.InvalidCode);
             }
@@ -92,20 +93,20 @@ namespace Survey_Basket_API.Services
                 await _UserManager.AddToRoleAsync(user, DefaultRoles.Member);
                 return Result.success();
             }
-                
+
 
             var error = result.Errors.First();
-                return Result.Failure(new Error(error.Code, error.Description, StatusCodes.Status400BadRequest));
+            return Result.Failure(new Error(error.Code, error.Description, StatusCodes.Status400BadRequest));
 
         }
-        public async Task <Result> RegisterAsync(RegisterRequest request ,CancellationToken cancellationToken)
+        public async Task<Result> RegisterAsync(RegisterRequest request, CancellationToken cancellationToken)
         {
-            var emailIsExist = await _UserManager.Users.AnyAsync(x =>x.Email == request.Email, cancellationToken: cancellationToken);
+            var emailIsExist = await _UserManager.Users.AnyAsync(x => x.Email == request.Email, cancellationToken: cancellationToken);
             if (emailIsExist)
                 return Result.Failure(UserCredentials.InvalidEmail);
 
             var user = request.Adapt<ApplicationUser>();
-            var result = await _UserManager.CreateAsync(user,request.Password);
+            var result = await _UserManager.CreateAsync(user, request.Password);
 
             if (result.Succeeded)
             {
@@ -113,7 +114,7 @@ namespace Survey_Basket_API.Services
                 code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
                 _logger.LogInformation("Confirmation code : {code}", code);
 
-                await SendConfirmationEmail(user,code);
+                await SendConfirmationEmail(user, code);
 
                 return Result.success();
             }
@@ -169,7 +170,7 @@ namespace Survey_Basket_API.Services
 
             var (userRoles, Permission) = await GetRolesAndPermission(user, cancellationToken);
 
-            var (newToken, expireIn) = _jwtProvider.GenerateToken(user,userRoles,Permission);
+            var (newToken, expireIn) = _jwtProvider.GenerateToken(user, userRoles, Permission);
             var newRefreshToken = GenerateRefreshToken();
             var ExpirationDate = DateTime.UtcNow.AddDays(_RefreshTokenExpirationDate);
 
@@ -229,7 +230,7 @@ namespace Survey_Basket_API.Services
         {
             var user = await _UserManager.FindByEmailAsync(request.Email);
             if (user is null || !user.EmailConfirmed)
-                return Result.Failure(UserCredentials.EmailNotConfirmed);
+                return Result.Failure(UserCredentials.EmailNotConfirmed with { StatusCode = StatusCodes.Status400BadRequest });
 
             IdentityResult result;
 
@@ -250,7 +251,7 @@ namespace Survey_Basket_API.Services
             return Result.Failure(new Error(error.Code, error.Description, StatusCodes.Status400BadRequest));
         }
 
-        private async Task SendConfirmationEmail(ApplicationUser user,string code)
+        private async Task SendConfirmationEmail(ApplicationUser user, string code)
         {
             var Origin = _httpContextAccessor.HttpContext?.Request.Headers.Origin;
 
@@ -263,28 +264,28 @@ namespace Survey_Basket_API.Services
             BackgroundJob.Enqueue(() => _emailSender.SendEmailAsync(user.Email!, "✅ Survey Basket : Email Confirmation", EmailBody));
             await Task.CompletedTask;
         }
-        private async Task SendForgetPasswordEmail(ApplicationUser user,string code)
+        private async Task SendForgetPasswordEmail(ApplicationUser user, string code)
         {
             var Origin = _httpContextAccessor.HttpContext?.Request.Headers.Origin;
 
             var EmailBody = EmailBodyBuilder.GenerateEmailBody("ForgetPassword", new Dictionary<string, string>
                 {
                     {"{{name}}",user.FirstName },
-                    { "{{action_url}}", $"{Origin}/auth/forgetPassword?email={user.Email}&code={code}" }  
+                    { "{{action_url}}", $"{Origin}/auth/forgetPassword?email={user.Email}&code={code}" }
                 }
             );
             BackgroundJob.Enqueue(() => _emailSender.SendEmailAsync(user.Email!, "✅ Survey Basket: Change Password ", EmailBody));
             await Task.CompletedTask;
         }
-        private async Task <(IEnumerable<string> Roles,IEnumerable<string> Permission)> GetRolesAndPermission(ApplicationUser user,CancellationToken cancellationToken)
+        private async Task<(IEnumerable<string> Roles, IEnumerable<string> Permission)> GetRolesAndPermission(ApplicationUser user, CancellationToken cancellationToken)
         {
             var userRoles = await _UserManager.GetRolesAsync(user);
 
-            var Permission = await(from r in _context.Roles
-                                   join p in _context.RoleClaims
-                                   on r.Id equals p.RoleId
-                                   where userRoles.Contains(r.Name!)
-                                   select p.ClaimValue)
+            var Permission = await (from r in _context.Roles
+                                    join p in _context.RoleClaims
+                                    on r.Id equals p.RoleId
+                                    where userRoles.Contains(r.Name!)
+                                    select p.ClaimValue)
                                     .Distinct()
                                     .ToListAsync(cancellationToken);
             return (userRoles, Permission);

@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Survey_Basket_API.Abstractions.Consts;
+﻿using Survey_Basket_API.Abstractions.Consts;
 
 namespace Survey_Basket_API.Controllers
 {
@@ -11,11 +9,11 @@ namespace Survey_Basket_API.Controllers
     {
         private readonly IResultServices _resultServices = resultServices;
 
-        [HttpGet("row-data")] 
+        [HttpGet("row-data")]
         public async Task<IActionResult> PollVotesAsync([FromRoute] int pollId, CancellationToken cancellationToken)
         {
             var result = await _resultServices.GetPollVotesAsync(pollId, cancellationToken);
-            return result.IsSuccess ? Ok(result.value) : result.ToProblem(); 
+            return result.IsSuccess ? Ok(result.value) : result.ToProblem();
         }
         [HttpGet("votes-per-day")]
         public async Task<IActionResult> VotesPerDay([FromRoute] int pollId, CancellationToken cancellationToken)

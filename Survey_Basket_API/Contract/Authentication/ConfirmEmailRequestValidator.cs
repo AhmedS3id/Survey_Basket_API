@@ -4,8 +4,8 @@
     {
         public ConfirmEmailRequestValidator()
         {
-            RuleFor(x=>x.UserId).NotEmpty();
-            RuleFor(x=>x.Code).NotEmpty();
+            RuleFor(x => x.UserId).NotEmpty();
+            RuleFor(x => x.Code).NotEmpty();
 
         }
     }

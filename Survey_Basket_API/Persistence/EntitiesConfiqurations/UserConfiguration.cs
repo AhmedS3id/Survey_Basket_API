@@ -16,9 +16,9 @@ namespace Survey_Basket_API.Persistence.EntitiesConfiqurations
             builder.Property(x => x.FirstName).HasMaxLength(100);
             builder.Property(x => x.LastName).HasMaxLength(100);
 
-           // var passwordHasher = new PasswordHasher<ApplicationUser>();
+            // var passwordHasher = new PasswordHasher<ApplicationUser>();
 
-            builder.HasData(new ApplicationUser 
+            builder.HasData(new ApplicationUser
             {
                 Id = DefaultUsers.AdminId,
                 FirstName = "Survey Basket",
@@ -31,7 +31,7 @@ namespace Survey_Basket_API.Persistence.EntitiesConfiqurations
                 ConcurrencyStamp = DefaultUsers.AdminConcurrencyStamp,
                 EmailConfirmed = true,
                 PasswordHash = DefaultUsers.AdminPasswordHash
-               // PasswordHash = passwordHasher.HashPassword(null!, DefaultUsers.AdminPassword)
+                // PasswordHash = passwordHasher.HashPassword(null!, DefaultUsers.AdminPassword)
             });
 
 

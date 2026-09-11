@@ -2,10 +2,10 @@
 {
     public static class DefaultUsers
     {
-        public const string AdminId = "e232de14-def2-4d76-9dcb-05f0eb7619a1";
+        public const string AdminId = "01a09095-1d7f-7d9b-846b-c55aaebfe3a0";
         public const string AdminEmail = "admin@survey-basket.com";
         public const string AdminPasswordHash = "AQAAAAIAAYagAAAAEBYocXB8KArWfHdt/nkNVt4ZJl+6o09BRIdEnR2WXpJDyiTwpguILscEOmiMTJB96g==";
-        public const string AdminConcurrencyStamp = "5abffc5a-7e3a-4963-a4e3-755bdda4e3d5";
+        public const string AdminConcurrencyStamp = "01a09095-1d7f-7c8e-a236-5809fa1cc7a1";
         public const string AdminSecurityStamp = "AC6C88E23E674BC0AA53B4B195D91D56";
     }
 }

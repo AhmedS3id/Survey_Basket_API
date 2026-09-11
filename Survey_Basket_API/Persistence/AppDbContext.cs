@@ -3,15 +3,15 @@
 
 namespace Survey_Basket_API.Persistence
 {
-    public class AppDbContext(DbContextOptions<AppDbContext> options,IHttpContextAccessor httpContextAccessor ) 
-        : IdentityDbContext<ApplicationUser,ApplicationRole, string>(options )
+    public class AppDbContext(DbContextOptions<AppDbContext> options, IHttpContextAccessor httpContextAccessor)
+        : IdentityDbContext<ApplicationUser, ApplicationRole, string>(options)
     {
-        public DbSet<Poll>Polls { get; set; }
-        public DbSet<Answer>Answers { get; set; }
-        public DbSet<Question>Questions { get; set; }
-        public DbSet<Vote>Votes { get; set; }
+        public DbSet<Poll> Polls { get; set; }
+        public DbSet<Answer> Answers { get; set; }
+        public DbSet<Question> Questions { get; set; }
+        public DbSet<Vote> Votes { get; set; }
         public DbSet<VoteAnswer> VoteAnswers { get; set; }
-        public IHttpContextAccessor _HttpContextAccessor  = httpContextAccessor;
+        public IHttpContextAccessor _HttpContextAccessor = httpContextAccessor;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -19,8 +19,8 @@ namespace Survey_Basket_API.Persistence
             var CascadeFk = modelBuilder.Model
                 .GetEntityTypes()
                 .SelectMany(t => t.GetForeignKeys())
-                .Where(fk => fk.DeleteBehavior == DeleteBehavior.Cascade&&!fk.IsOwnership);
-            foreach(var fk in CascadeFk)
+                .Where(fk => fk.DeleteBehavior == DeleteBehavior.Cascade && !fk.IsOwnership);
+            foreach (var fk in CascadeFk)
                 fk.DeleteBehavior = DeleteBehavior.Restrict;
 
             base.OnModelCreating(modelBuilder);
@@ -31,7 +31,7 @@ namespace Survey_Basket_API.Persistence
             var entries = ChangeTracker.Entries<AuditTableEntity>();
             foreach (var entityEntry in entries)
             {
-                if (entityEntry.State == EntityState.Added) 
+                if (entityEntry.State == EntityState.Added)
                 {
                     entityEntry.Property(x => x.CreatedById).CurrentValue = CurrentUserId!;
 

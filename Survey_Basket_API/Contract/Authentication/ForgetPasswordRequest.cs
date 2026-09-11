@@ -1,6 +1,6 @@
 ﻿namespace Survey_Basket_API.Contract.Authentication
 {
-    public record ForgetPasswordRequest(    
+    public record ForgetPasswordRequest(
         string Email
     );
 }

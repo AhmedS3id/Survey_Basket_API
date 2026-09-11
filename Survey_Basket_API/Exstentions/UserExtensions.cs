@@ -6,7 +6,7 @@ namespace Survey_Basket_API.Extensions
     {
         public static string? GetUserId(this ClaimsPrincipal User)
         {
-            return( User.FindFirstValue(ClaimTypes.NameIdentifier));
+            return (User.FindFirstValue(ClaimTypes.NameIdentifier));
         }
     }
 }

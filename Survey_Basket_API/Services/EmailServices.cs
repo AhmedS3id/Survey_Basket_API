@@ -6,7 +6,7 @@ using SmtpClient = MailKit.Net.Smtp.SmtpClient;
 
 namespace Survey_Basket_API.Services
 {
-    public class EmailServices(IOptions<MailSettings> mailSetting,ILogger<EmailServices> logger) : IEmailSender
+    public class EmailServices(IOptions<MailSettings> mailSetting, ILogger<EmailServices> logger) : IEmailSender
     {
         private readonly MailSettings _mailSetting = mailSetting.Value;
         private readonly ILogger<EmailServices> _logger = logger;
@@ -24,7 +24,7 @@ namespace Survey_Basket_API.Services
                 HtmlBody = htmlMessage
             };
 
-            message.Body=builder.ToMessageBody();
+            message.Body = builder.ToMessageBody();
 
             //using packag mailkit
             using var smtp = new SmtpClient();
@@ -38,7 +38,7 @@ namespace Survey_Basket_API.Services
             _logger.LogInformation("Sending email to :{email}", email);
             //  دى لازم على ال production
             //   smtp.Connect(_mailSetting.Host, _mailSetting.Port, SecureSocketOptions.StartTls);
-            smtp.Authenticate(_mailSetting.Mail,_mailSetting.Password);
+            smtp.Authenticate(_mailSetting.Mail, _mailSetting.Password);
             await smtp.SendAsync(message);
             smtp.Disconnect(true);
         }

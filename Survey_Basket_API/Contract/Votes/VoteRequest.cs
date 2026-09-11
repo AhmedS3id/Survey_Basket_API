@@ -3,6 +3,6 @@
     public record VoteRequest(
          ICollection<VoteAnswerRequest> Answer
         );
-    
-    
+
+
 }

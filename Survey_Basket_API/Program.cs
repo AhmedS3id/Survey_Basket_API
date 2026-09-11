@@ -1,17 +1,13 @@
 using Hangfire;
-using Hangfire.Dashboard;
 using HangfireBasicAuthenticationFilter;
 using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using Survey_Basket_API;
-using Survey_Basket_API.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Host.UseSerilog((context,configurations)=>
+builder.Host.UseSerilog((context, configurations) =>
 {
     configurations.ReadFrom.Configuration(context.Configuration);
     //configurations
@@ -48,7 +44,7 @@ app.UseHangfireDashboard("/jobs", new DashboardOptions
         }
         ],
     DashboardTitle = "Survey Basket Dashboard",
-   // IsReadOnlyFunc = (DashboardContext context) => true
+    // IsReadOnlyFunc = (DashboardContext context) => true
 
 });
 
@@ -74,7 +70,7 @@ app.UseExceptionHandler();
 
 app.UseRateLimiter();
 
-app.MapHealthChecks("health",new HealthCheckOptions
+app.MapHealthChecks("health", new HealthCheckOptions
 {
     ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
 });

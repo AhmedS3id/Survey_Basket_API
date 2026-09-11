@@ -1,4 +1,4 @@
-﻿ namespace Survey_Basket_API.Contract.Users
+﻿namespace Survey_Basket_API.Contract.Users
 {
     public record UsersProfileResponse(
         string Email,

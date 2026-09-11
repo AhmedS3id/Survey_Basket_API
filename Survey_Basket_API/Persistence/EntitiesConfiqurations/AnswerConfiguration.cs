@@ -6,7 +6,7 @@ namespace Survey_Basket_API.Persistence.EntitiesConfiguration
     {
         public void Configure(EntityTypeBuilder<Answer> builder)
         {
-            builder.HasIndex(x => new {x.QuestionId,x.Content}).IsUnique();
+            builder.HasIndex(x => new { x.QuestionId, x.Content }).IsUnique();
             builder.Property(x => x.Content).HasMaxLength(1000);
 
         }

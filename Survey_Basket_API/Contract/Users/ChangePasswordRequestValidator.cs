@@ -6,7 +6,7 @@ namespace Survey_Basket_API.Contract.Users
     {
         public ChangePasswordRequestValidator()
         {
-            RuleFor(x=>x.CurrentPassword)
+            RuleFor(x => x.CurrentPassword)
                 .NotEmpty();
             RuleFor(x => x.NewPassword)
                 .NotEmpty()

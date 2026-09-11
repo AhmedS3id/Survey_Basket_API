@@ -4,11 +4,11 @@ using Survey_Basket_API.Abstractions.Consts;
 
 namespace Survey_Basket_API.Controllers
 {
-    [ApiVersion("1",Deprecated =true)]
+    [ApiVersion("1", Deprecated = true)]
     [ApiVersion("2")]
     [Route("api/[controller]")]
     [ApiController]
-   
+
     public class PollsController(IPollServices pollServices) : ControllerBase
     {
         private readonly IPollServices _pollServices = pollServices;
@@ -56,8 +56,8 @@ namespace Survey_Basket_API.Controllers
 
             //var response = result.Adapt<PollResponse>();
             //return Ok(response);
-            return result.IsSuccess ? Ok(result.value) 
-            :result.ToProblem();
+            return result.IsSuccess ? Ok(result.value)
+            : result.ToProblem();
 
         }
 
@@ -65,10 +65,10 @@ namespace Survey_Basket_API.Controllers
         [HasPermission(Permissions.AddPolls)]
         public async Task<IActionResult> Add([FromBody] PollRequest request, CancellationToken cancellationToken = default)
         {
-            var result = await _pollServices.AddAsync(request,cancellationToken);
+            var result = await _pollServices.AddAsync(request, cancellationToken);
 
-            return result.IsSuccess?
-                CreatedAtAction(nameof(Get), new { id = result.value.Id },result.value)
+            return result.IsSuccess ?
+                CreatedAtAction(nameof(Get), new { id = result.value.Id }, result.value)
                 : result.ToProblem();
 
         }
@@ -87,10 +87,10 @@ namespace Survey_Basket_API.Controllers
         public async Task<IActionResult> Delete([FromRoute] int id, CancellationToken cancellationToken)
         {
             var result = await _pollServices.DeleteAsync(id, cancellationToken);
-           return result.IsSuccess?NoContent() : result.ToProblem();   
+            return result.IsSuccess ? NoContent() : result.ToProblem();
         }
 
-        [HttpPut("{id}/togglePublish")]
+        [HttpPut("{id}/toggle-Publish")]
         [HasPermission(Permissions.UpdatePolls)]
         public async Task<IActionResult> TogglePublishStatus([FromRoute] int id, CancellationToken cancellationToken = default)
         {

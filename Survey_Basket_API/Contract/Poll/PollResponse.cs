@@ -4,17 +4,17 @@
     (
         int Id,
         string Title,
-        string Summary ,
-        DateOnly StartsAt ,
+        string Summary,
+        DateOnly StartsAt,
         DateOnly EndsAt
-    );   
+    );
     public record PollResponseV2
     (
         int Id,
         string Title,
-        string Summary ,
+        string Summary,
         bool IsPublished,
-        DateOnly StartsAt ,
+        DateOnly StartsAt,
         DateOnly EndsAt
-    );   
+    );
 }

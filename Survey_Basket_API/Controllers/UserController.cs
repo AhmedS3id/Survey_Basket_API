@@ -1,7 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Survey_Basket_API.Abstractions.Consts;
-using System.Threading.Tasks;
+﻿using Survey_Basket_API.Abstractions.Consts;
 
 namespace Survey_Basket_API.Controllers
 {
@@ -29,31 +26,31 @@ namespace Survey_Basket_API.Controllers
         public async Task<IActionResult> Add([FromBody] CreateUserRequest request)
         {
             var result = await _userService.AddAsync(request);
-            return result.IsSuccess ? CreatedAtAction(nameof(GetAll),new {result.value.Id},result.value) : result.ToProblem();
+            return result.IsSuccess ? CreatedAtAction(nameof(GetAll), new { result.value.Id }, result.value) : result.ToProblem();
         }
         [HttpPut("{id}")]
         [HasPermission(Permissions.UpdateUsers)]
-        public async Task<IActionResult> Update([FromRoute]string id,[FromBody] UpdateUserRequest request)
+        public async Task<IActionResult> Update([FromRoute] string id, [FromBody] UpdateUserRequest request)
         {
-            var result = await _userService.UpdateAsync(id,request);
+            var result = await _userService.UpdateAsync(id, request);
             return result.IsSuccess ? NoContent() : result.ToProblem();
         }
         [HttpPut("info")]
-        public async Task<IActionResult> UpdateUserProfile( [FromBody] UpdateProfileRequest request)
+        public async Task<IActionResult> UpdateUserProfile([FromBody] UpdateProfileRequest request)
         {
             var result = await _userService.UpdateUserProfileAsync(User.GetUserId()!, request);
             return result.IsSuccess ? NoContent() : result.ToProblem();
         }
         [HttpPut("{id}/toggle-status")]
         [HasPermission(Permissions.UpdateUsers)]
-        public async Task<IActionResult> ToggleStatus([FromRoute]string id)
+        public async Task<IActionResult> ToggleStatus([FromRoute] string id)
         {
             var result = await _userService.ToggleStatus(id);
             return result.IsSuccess ? NoContent() : result.ToProblem();
         }
         [HttpPut("{id}/unlock")]
         [HasPermission(Permissions.UpdateUsers)]
-        public async Task<IActionResult> Unlock([FromRoute]string id)
+        public async Task<IActionResult> Unlock([FromRoute] string id)
         {
             var result = await _userService.UnlockAcc(id);
             return result.IsSuccess ? NoContent() : result.ToProblem();

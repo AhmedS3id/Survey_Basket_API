@@ -10,10 +10,10 @@ namespace Survey_Basket_API.Persistence.EntitiesConfiguration
             builder.HasData(new ApplicationRole
             {
                 Name = DefaultRoles.Admin,
-                Id =DefaultRoles.AdminRoleId,
+                Id = DefaultRoles.AdminRoleId,
                 NormalizedName = DefaultRoles.Admin.ToUpper(),
-                ConcurrencyStamp =DefaultRoles.AdminRoleConcurrencyStamp
-                
+                ConcurrencyStamp = DefaultRoles.AdminRoleConcurrencyStamp
+
             });
 
             builder.HasData(new ApplicationRole

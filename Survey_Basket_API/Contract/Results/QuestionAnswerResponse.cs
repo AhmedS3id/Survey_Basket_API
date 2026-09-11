@@ -4,6 +4,6 @@
         string Question,
         string Answer
         );
-    
-    
+
+
 }

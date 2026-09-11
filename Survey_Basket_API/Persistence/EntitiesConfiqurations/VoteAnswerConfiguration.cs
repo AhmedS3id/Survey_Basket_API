@@ -6,7 +6,7 @@ namespace Survey_Basket_API.Persistence.EntitiesConfiguration
     {
         public void Configure(EntityTypeBuilder<VoteAnswer> builder)
         {
-            builder.HasIndex(x =>new {x.VoteId,x.QuestionId }).IsUnique();
+            builder.HasIndex(x => new { x.VoteId, x.QuestionId }).IsUnique();
         }
     }
 }

@@ -4,6 +4,6 @@
         DateOnly Date,
         int NumberOfVotes
         );
-    
-    
+
+
 }

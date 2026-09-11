@@ -4,7 +4,7 @@ namespace Survey_Basket_API.Contract.Poll
 {
     public record PollRequest
     (
-        
+
        int Id,
        [Required(ErrorMessage ="كتف امك اكتب التايتل")]
         string Title,

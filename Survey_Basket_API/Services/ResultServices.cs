@@ -9,7 +9,7 @@ namespace Survey_Basket_API.Services
 
         public async Task<Result<PollVoteResponse>> GetPollVotesAsync(int pollId, CancellationToken cancellationToken)
         {
-            var pollVotes =await _context.Polls
+            var pollVotes = await _context.Polls
                 .Where(x => x.Id == pollId)
                 .Select(x => new PollVoteResponse(
                     x.Title,
@@ -24,9 +24,9 @@ namespace Survey_Basket_API.Services
 
                     )).SingleOrDefaultAsync(cancellationToken);
 
-            return pollVotes is null?
+            return pollVotes is null ?
                 Result.Failure<PollVoteResponse>(PollsErrors.InvalidPolls)
-                :Result.success(pollVotes);
+                : Result.success(pollVotes);
         }
         public async Task<Result<IEnumerable<VotePerDayResponse>>> GetVotesPerDayAsync(int pollId, CancellationToken cancellationToken = default)
         {
@@ -54,13 +54,13 @@ namespace Survey_Basket_API.Services
             if (!pollIsExists)
                 return Result.Failure<IEnumerable<VotePerQuestionResponse>>(PollsErrors.InvalidPolls);
 
-            var VotePerQuestion = await _context.VoteAnswers 
-                .Where(x=>x.Vote.PollId==pollId)
-                .Select(y=>new VotePerQuestionResponse(
+            var VotePerQuestion = await _context.VoteAnswers
+                .Where(x => x.Vote.PollId == pollId)
+                .Select(y => new VotePerQuestionResponse(
                     y.Question.Content,
                     y.Question.Votes
                     .GroupBy(x => new { x.AnswerId, AnswerContent = x.Answer.Content })
-                    .Select(g=> new VotePerAnswerResponse(
+                    .Select(g => new VotePerAnswerResponse(
                     g.Key.AnswerContent,
                     g.Count()
                     ))

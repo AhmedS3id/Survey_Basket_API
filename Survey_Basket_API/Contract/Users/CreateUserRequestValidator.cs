@@ -28,7 +28,7 @@ namespace Survey_Basket_API.Contract.Users
                 .Must(x => x.Distinct().Count() == x.Count)
                 .WithMessage("You can't duplicated roles to the same user")
                 .When(x => x.Roles != null);
-           // to avoid exception 
+            // to avoid exception 
         }
     }
 }
